@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        .bubble {
+            position: absolute;
+            width: var(--size);
+            height: var(--size);
+            left: var(--left);
+            top: var(--top);
+            background: rgba(100, 149, 237, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease-out;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(100, 149, 237, 0.3);
+            transform: skew(var(--skew));
+        }
+
+        .bubble:hover {
+            transform: scale(1.1) skew(var(--skew));
+            background: rgba(100, 149, 237, 0.3);
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+        }
+        .step-content {
+            display: none;
+        }
+        .step-content.active {
+            display: block;
+        }
+        /* Smooth transitions */
+        .fade-enter {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        .fade-enter-active {
+            opacity: 1;
+            transform: translateX(0);
+            transition: opacity 300ms, transform 300ms;
+        }
+        /* Progress bar animation */
+        @keyframes progress {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen flex items-stretch bg-white sm:bg-gray-50 relative">
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] hidden sm:block"></div>
+
+        <!-- Interactive bubbles -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
+            <div class="bubble" style="--size: 180px; --left: 15%; --top: 15%; --skew: -15deg;"></div>
+            <div class="bubble" style="--size: 140px; --left: 5%; --top: 45%; --skew: 20deg;"></div>
+            <div class="bubble" style="--size: 120px; --left: 20%; --top: 75%; --skew: -10deg;"></div>
+            <div class="bubble" style="--size: 160px; --left: 75%; --top: 20%; --skew: 15deg;"></div>
+            <div class="bubble" style="--size: 130px; --left: 85%; --top: 50%; --skew: -20deg;"></div>
+        </div>
+
+        <!-- Selection Screen -->
+        <div id="selection-screen" class="w-full sm:max-w-[480px] sm:mx-auto sm:my-auto relative z-10">
+            <div class="bg-white w-full min-h-screen sm:min-h-0 flex flex-col justify-center sm:bg-white/80 sm:backdrop-blur-sm sm:h-auto px-6 py-8 sm:px-12 sm:py-10 sm:shadow-lg sm:rounded-2xl">
+                <div class="w-full max-w-[400px] mx-auto">
+                    <h2 class="text-3xl sm:text-2xl font-semibold text-center text-gray-900">
+                        Join Our Platform
+                    </h2>
+                    <p class="mt-4 text-lg sm:text-base text-center text-gray-600">
+                        Choose how you'd like to register with us
+                    </p>
+
+                    <div class="mt-12 sm:mt-8">
+                        <div class="flex gap-4 justify-center">
+                            <!-- User Button -->
+                            <button onclick="showForm('user')"
+                                    class="flex-1 px-4 py-4 sm:py-3.5 bg-black text-white text-base font-medium hover:bg-gray-900 transition-colors duration-200 rounded-xl flex flex-col items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                                </svg>
+                                <span>Sign up as User</span>
+                            </button>
+
+                            <!-- Company Button -->
+                            <button onclick="showForm('company')"
+                                    class="flex-1 px-4 py-4 sm:py-3.5 border-2 border-black text-black text-base font-medium hover:bg-gray-100 transition-colors duration-200 rounded-xl flex flex-col items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                                </svg>
+                                <span>Sign up as Company</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Form -->
+<!-- User Form -->
+<div id="user-form" class="w-full max-w-2xl sm:mx-auto sm:my-auto relative z-10 hidden">
+    <!-- Progress Indicator -->
+    <div class="mb-8">
+      <div class="flex justify-between mb-2">
+        <span class="text-sm font-medium text-gray-500" id="user-step-indicator">Step 1 of 6</span>
+        <span class="text-sm font-medium text-gray-500" id="user-step-title">Basic Information</span>
+      </div>
+      <div class="w-full bg-gray-100 h-2 rounded-full">
+        <div id="user-progress-bar" class="bg-black h-2 rounded-full transition-all duration-500" style="width: 16.66%"></div>
+      </div>
+    </div>
+  
+    <!-- Form Container -->
+    <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+      <form id="user-registration-form" class="space-y-6">
+        <!-- Step 1: Basic Information -->
+        <div class="step-content active" id="user-step1">
+          <h2 class="text-2xl font-semibold text-black mb-6">Tell us about yourself</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <input type="text" 
+                     name="full_name"
+                     class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
+                     placeholder="Enter your full name" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input type="email" 
+                     name="email"
+                     class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
+                     placeholder="Enter your email" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <input type="password" 
+                     name="password"
+                     class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
+                     placeholder="Create a password" required />
+            </div>
+          </div>
+        </div>
+  
+        <!-- Step 2: Professional Background -->
+        <div class="step-content" id="user-step2">
+          <h2 class="text-2xl font-semibold text-black mb-6">Professional Background</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Current Role</label>
+              <input type="text" 
+                     name="current_role"
+                     class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
+                     placeholder="Your current job title" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
+              <select name="experience" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                <option value="">Select experience</option>
+                <option value="0-2">0-2 years</option>
+                <option value="3-5">3-5 years</option>
+                <option value="5-10">5-10 years</option>
+                <option value="10+">10+ years</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+              <select name="industry" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                <option value="">Select industry</option>
+                <option value="tech">Technology</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="finance">Finance</option>
+                <option value="education">Education</option>
+                <option value="retail">Retail</option>
+              </select>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Step 3: Work Preferences -->
+        <div class="step-content" id="user-step3">
+          <h2 class="text-2xl font-semibold text-black mb-6">Work Preferences</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Preferred Work Environment</label>
+              <select name="work_environment" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                <option value="">Select preference</option>
+                <option value="remote">Remote</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="onsite">On-site</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Working Hours Preference</label>
+              <select name="working_hours" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                <option value="">Select preference</option>
+                <option value="fixed">Fixed Hours (9-5)</option>
+                <option value="flexible">Flexible Hours</option>
+                <option value="shifts">Shift Based</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Preferred Company Size</label>
+              <select name="company_size" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                <option value="">Select preference</option>
+                <option value="startup">Startup</option>
+                <option value="small">Small Business</option>
+                <option value="medium">Mid-sized Company</option>
+                <option value="large">Large Corporation</option>
+              </select>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Step 4: Work Style & Culture -->
+        <div class="step-content" id="user-step4">
+          <h2 class="text-2xl font-semibold text-black mb-6">Work Style & Culture</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Preferred Work Pace</label>
+              <select name="work_pace" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                <option value="">Select preference</option>
+                <option value="fast">Fast-paced</option>
+                <option value="balanced">Balanced</option>
+                <option value="relaxed">Relaxed</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Communication Style</label>
+              <select name="communication_style" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                <option value="">Select preference</option>
+                <option value="formal">Formal</option>
+                <option value="casual">Casual</option>
+                <option value="mixed">Mixed</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Team Dynamic</label>
+              <select name="team_dynamic" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                <option value="">Select preference</option>
+                <option value="collaborative">Highly Collaborative</option>
+                <option value="independent">Independent Work</option>
+                <option value="mixed">Mixed Approach</option>
+              </select>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Step 5: Well-being Priorities -->
+        <div class="step-content" id="user-step5">
+          <h2 class="text-2xl font-semibold text-black mb-6">Well-being Priorities</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Mental Health Support Importance</label>
+              <select name="mental_health_importance" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                <option value="">Select importance</option>
+                <option value="essential">Essential</option>
+                <option value="important">Important</option>
+                <option value="nice_to_have">Nice to have</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Work-Life Balance Preference</label>
+              <select name="work_life_balance" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                <option value="">Select preference</option>
+                <option value="strict">Strict boundaries</option>
+                <option value="flexible">Flexible integration</option>
+                <option value="project">Project-based</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Wellness Programs Interest</label>
+              <select name="wellness_programs" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                <option value="">Select interest</option>
+                <option value="mental">Mental health support</option>
+                <option value="physical">Physical health programs</option>
+                <option value="professional">Professional development</option>
+              </select>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Step 6: Career Goals & Benefits -->
+        <div class="step-content" id="user-step6">
+          <h2 class="text-2xl font-semibold text-black mb-6">Career Goals & Benefits</h2>
+          <div class="space-y-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Primary Motivation</label>
+              <select name="primary_motivation" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                <option value="">Select primary motivation</option>
+                <option value="career_growth">Career Growth</option>
+                <option value="work_life">Work-Life Balance</option>
+                <option value="financial">Financial Growth</option>
+                <option value="impact">Impact & Purpose</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-3">Important Benefits (Select up to 3)</label>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label class="flex items-center space-x-3">
+                  <input type="checkbox" name="benefits[]" value="health_insurance" class="form-checkbox h-5 w-5 text-black rounded border-gray-300">
+                  <span class="text-gray-700">Health Insurance</span>
+                </label>
+                <label class="flex items-center space-x-3">
+                  <input type="checkbox" name="benefits[]" value="mental_health" class="form-checkbox h-5 w-5 text-black rounded border-gray-300">
+                  <span class="text-gray-700">Mental Health Coverage</span>
+                </label>
+                <label class="flex items-center space-x-3">
+                  <input type="checkbox" name="benefits[]" value="professional_dev" class="form-checkbox h-5 w-5 text-black rounded border-gray-300">
+                  <span class="text-gray-700">Professional Development</span>
+                </label>
+                <label class="flex items-center space-x-3">
+                  <input type="checkbox" name="benefits[]" value="flexible_hours" class="form-checkbox h-5 w-5 text-black rounded border-gray-300">
+                  <span class="text-gray-700">Flexible Hours</span>
+                </label>
+                <label class="flex items-center space-x-3">
+                  <input type="checkbox" name="benefits[]" value="remote_work" class="form-checkbox h-5 w-5 text-black rounded border-gray-300">
+                  <span class="text-gray-700">Remote Work</span>
+                </label>
+                <label class="flex items-center space-x-3">
+                  <input type="checkbox" name="benefits[]" value="401k" class="form-checkbox h-5 w-5 text-black rounded border-gray-300">
+                  <span class="text-gray-700">401k Match</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between pt-6">
+          <button type="button" 
+                  id="user-prevBtn" 
+                  class="px-6 py-3 text-gray-500 font-medium hover:text-black transition-colors hidden">
+            Back
+          </button>
+          <button type="button" 
+                  id="user-nextBtn" 
+                  class="ml-auto px-6 py-3 bg-black text-white hover:bg-gray-900 transition-colors font-medium rounded-xl">
+            Continue
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+        <!-- Company Form -->
+        <div id="company-form" class="w-full max-w-2xl sm:mx-auto sm:my-auto relative z-10 hidden">
+            <!-- Progress Indicator -->
+            <div class="mb-8">
+                <div class="flex justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-500" id="step-indicator">Step 1 of 6</span>
+                    <span class="text-sm font-medium text-gray-500" id="step-title">Basic Information</span>
+                </div>
+                <div class="w-full bg-gray-100 h-2 rounded-full">
+                    <div id="progress-bar" class="bg-black h-2 rounded-full transition-all duration-500" style="width: 16.66%"></div>
+                </div>
+            </div>
+
+            <!-- Form Container -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                <button onclick="showSelection()" class="mb-6 text-gray-600 hover:text-black flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                    Back
+                </button>
+
+                <form id="company-registration-form" class="space-y-6">
+                    <!-- Step 1: Basic Information (Initially Visible) -->
+                    <!-- Step 1: Basic Information -->
+          <div class="step-content active" id="step1">
+            <h2 class="text-2xl font-semibold text-black mb-6">Tell us about your company</h2>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                <input type="text"
+                       name="company_name"
+                       class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
+                       placeholder="Enter your company name" required />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Company Description</label>
+                <textarea
+                  name="company_description"
+                  class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
+                  rows="4"
+                  placeholder="Tell us about your company's mission and values" required></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Company Details -->
+          <div class="step-content" id="step2">
+            <h2 class="text-2xl font-semibold text-black mb-6">Company Details</h2>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+                <select name="industry" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                  <option value="">Select Industry</option>
+                  <option value="tech">Technology & Software</option>
+                  <option value="healthcare">Healthcare & Medical</option>
+                  <option value="finance">Finance & Banking</option>
+                  <option value="education">Education</option>
+                  <option value="retail">Retail & E-commerce</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Company Size</label>
+                <select name="company_size" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                  <option value="">Select Company Size</option>
+                  <option value="small">Small Business (Less than 50)</option>
+                  <option value="medium">Mid-sized Company (50-500)</option>
+                  <option value="large">Large Corporation (500+)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <input type="text"
+                       name="location"
+                       class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
+                       placeholder="Company Location" required />
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Work Environment -->
+          <div class="step-content" id="step3">
+            <h2 class="text-2xl font-semibold text-black mb-6">Work Environment</h2>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Office Type</label>
+                <select name="office_type" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                  <option value="">Select Office Type</option>
+                  <option value="remote">Fully Remote</option>
+                  <option value="hybrid">Hybrid</option>
+                  <option value="onsite">On-site</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Working Hours</label>
+                <select name="working_hours" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                  <option value="">Select Working Hours</option>
+                  <option value="fixed">Fixed Hours (9-5)</option>
+                  <option value="flexible">Flexible Hours</option>
+                  <option value="shifts">Shift Based</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Office Layout</label>
+                <select name="office_layout" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                  <option value="">Select Office Layout</option>
+                  <option value="open">Open Space</option>
+                  <option value="private">Private Offices</option>
+                  <option value="mixed">Mixed Layout</option>
+                  <option value="hot_desk">Hot Desking</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Company Culture -->
+          <div class="step-content" id="step4">
+            <h2 class="text-2xl font-semibold text-black mb-6">Company Culture</h2>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Work Pace</label>
+                <select name="work_pace" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                  <option value="">Select Work Pace</option>
+                  <option value="fast">Fast-paced</option>
+                  <option value="balanced">Balanced</option>
+                  <option value="relaxed">Relaxed</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Communication Style</label>
+                <select name="communication_style" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                  <option value="">Select Communication Style</option>
+                  <option value="formal">Formal</option>
+                  <option value="casual">Casual</option>
+                  <option value="mixed">Mixed</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Team Dynamic</label>
+                <select name="team_dynamic" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                  <option value="">Select Team Dynamic</option>
+                  <option value="collaborative">Highly Collaborative</option>
+                  <option value="independent">Independent Work</option>
+                  <option value="mixed">Mixed Approach</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5: Well-being Programs -->
+          <div class="step-content" id="step5">
+            <h2 class="text-2xl font-semibold text-black mb-6">Well-being Programs</h2>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Mental Health Support</label>
+                <select name="mental_health_support" class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors" required>
+                  <option value="">Select Support Level</option>
+                  <option value="basic">Basic Coverage</option>
+                  <option value="comprehensive">Comprehensive Support</option>
+                  <option value="premium">Premium Wellness Package</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Wellness Budget (per employee/year)</label>
+                <input type="number"
+                       name="wellness_budget"
+                       class="w-full px-4 py-3 bg-transparent border border-gray-200 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
+                       placeholder="Enter amount" required />
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 6: Benefits -->
+          <div class="step-content" id="step6">
+            <h2 class="text-2xl font-semibold text-black mb-6">Company Benefits</h2>
+            <div class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label class="flex items-center space-x-3">
+                  <input type="checkbox" name="benefits[]" value="flexible_hours" class="form-checkbox h-5 w-5 text-black rounded border-gray-300">
+                  <span class="text-gray-700">Flexible Hours</span>
+                </label>
+                <label class="flex items-center space-x-3">
+                  <input type="checkbox" name="benefits[]" value="remote_work" class="form-checkbox h-5 w-5 text-black rounded border-gray-300">
+                  <span class="text-gray-700">Remote Work Options</span>
+                </label>
+                <label class="flex items-center space-x-3">
+                  <input type="checkbox" name="benefits[]" value="health_insurance" class="form-checkbox h-5 w-5 text-black rounded border-gray-300">
+                  <span class="text-gray-700">Health Insurance</span>
+                </label>
+                <label class="flex items-center space-x-3">
+                  <input type="checkbox" name="benefits[]" value="mental_health" class="form-checkbox h-5 w-5 text-black rounded border-gray-300">
+                  <span class="text-gray-700">Mental Health Coverage</span>
+                </label>
+                <label class="flex items-center space-x-3">
+                  <input type="checkbox" name="benefits[]" value="professional_dev" class="form-checkbox h-5 w-5 text-black rounded border-gray-300">
+                  <span class="text-gray-700">Professional Development</span>
+                </label>
+                <label class="flex items-center space-x-3">
+                  <input type="checkbox" name="benefits[]" value="401k" class="form-checkbox h-5 w-5 text-black rounded border-gray-300">
+                  <span class="text-gray-700">401k Match</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation Buttons -->
+         
+
+                    <!-- Navigation Buttons -->
+                    <div class="flex justify-between pt-6">
+                        <button type="button"
+                                id="prevBtn"
+                                class="px-6 py-3 text-gray-500 font-medium hover:text-black transition-colors hidden">
+                            Back
+                        </button>
+                        <button type="button"
+                                id="nextBtn"
+                                class="ml-auto px-6 py-3 bg-black text-white hover:bg-gray-900 transition-colors font-medium rounded-xl">
+                            Continue
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Step Indicator Dots -->
+            <div class="flex justify-center space-x-2 mt-6">
+                <div class="w-2 h-2 rounded-full bg-black"></div>
+                <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+                <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+                <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+                <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+                <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSelection() {
+            document.getElementById('selection-screen').classList.remove('hidden');
+            document.getElementById('user-form').classList.add('hidden');
+            document.getElementById('company-form').classList.add('hidden');
+        }
+
+        function showForm(type) {
+            document.getElementById('selection-screen').classList.add('hidden');
+            if (type === 'user') {
+                document.getElementById('user-form').classList.remove('hidden');
+                document.getElementById('company-form').classList.add('hidden');
+            } else {
+                document.getElementById('user-form').classList.add('hidden');
+                document.getElementById('company-form').classList.remove('hidden');
+            }
+        }
+
+        function handleSubmit(event, type) {
+            event.preventDefault();
+            // Handle form submission here
+            console.log(`${type} form submitted`);
+        }
+
+        let currentStep = 1;
+        const totalSteps = 6;
+
+        function validateCurrentStep() {
+            const currentStepElement = document.getElementById(`step${currentStep}`);
+            const requiredFields = currentStepElement.querySelectorAll('input[required], select[required], textarea[required]');
+           
+            let isValid = true;
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('border-red-500');
+                    // Remove error styling when user starts typing
+                    field.addEventListener('input', function() {
+                        this.classList.remove('border-red-500');
+                    }, { once: true });
+                }
+            });
+
+            // Special validation for step 6 (Terms checkbox)
+            if (currentStep === 6) {
+                const termsCheckbox = document.getElementById('terms');
+                if (!termsCheckbox.checked) {
+                    isValid = false;
+                    termsCheckbox.parentElement.classList.add('text-red-500');
+                    termsCheckbox.addEventListener('change', function() {
+                        this.parentElement.classList.remove('text-red-500');
+                    }, { once: true });
+                }
+            }
+
+            if (!isValid) {
+                // Show error message
+                const existingError = currentStepElement.querySelector('.error-message');
+                if (!existingError) {
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'error-message text-red-500 text-sm mt-2';
+                    errorMessage.textContent = 'Please fill in all required fields';
+                    currentStepElement.appendChild(errorMessage);
+                }
+            }
+
+            return isValid;
+        }
+
+        function updateProgressBar() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('step-indicator').textContent = `Step ${currentStep} of ${totalSteps}`;
+           
+            // Update step title
+            const titles = ['Basic Information', 'Company Details', 'Contact Information', 'Legal Information', 'Documents', 'Review'];
+            document.getElementById('step-title').textContent = titles[currentStep - 1];
+           
+            // Update step indicator dots
+            const dots = document.querySelectorAll('.flex.justify-center.space-x-2 .rounded-full');
+            dots.forEach((dot, index) => {
+                dot.className = `w-2 h-2 rounded-full ${index + 1 === currentStep ? 'bg-black' : 'bg-gray-200'}`;
+            });
+        }
+
+        function showStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.step-content').forEach(el => {
+                el.classList.remove('active');
+            });
+           
+            // Show current step
+            document.getElementById(`step${step}`).classList.add('active');
+           
+            // Update navigation buttons
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+           
+            prevBtn.style.display = step === 1 ? 'none' : 'block';
+            nextBtn.textContent = step === totalSteps ? 'Submit' : 'Continue';
+        }
+
+        // Updated event listeners for navigation buttons
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                if (validateCurrentStep()) {
+                    currentStep++;
+                    showStep(currentStep);
+                    updateProgressBar();
+                }
+            } else {
+                if (validateCurrentStep()) {
+                    // Handle form submission
+                    console.log('Form submitted');
+                    document.getElementById('company-registration-form').submit();
+                }
+            }
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+                updateProgressBar();
+            }
+        });
+
+        // User Registration Form Handling
+        document.addEventListener('DOMContentLoaded', function() {
+          // Constants
+          const userForm = document.getElementById('user-registration-form');
+          const userPrevBtn = document.getElementById('user-prevBtn');
+          const userNextBtn = document.getElementById('user-nextBtn');
+          const userProgressBar = document.getElementById('user-progress-bar');
+          const userStepIndicator = document.getElementById('user-step-indicator');
+          const userStepTitle = document.getElementById('user-step-title');
+          
+          let currentUserStep = 1;
+          const totalUserSteps = 6;
+          
+          const userStepTitles = [
+            'Basic Information',
+            'Professional Background',
+            'Work Preferences',
+            'Work Style & Culture',
+            'Well-being Priorities',
+            'Career Goals & Benefits'
+          ];
+
+          // Show specific step
+          function showUserStep(step) {
+            // Hide all steps
+            document.querySelectorAll('#user-registration-form .step-content').forEach(el => {
+              el.classList.remove('active');
+            });
+            
+            // Show current step
+            document.getElementById(`user-step${step}`).classList.add('active');
+            
+            // Update progress bar
+            const progress = (step / totalUserSteps) * 100;
+            userProgressBar.style.width = `${progress}%`;
+            
+            // Update step indicator
+            userStepIndicator.textContent = `Step ${step} of ${totalUserSteps}`;
+            userStepTitle.textContent = userStepTitles[step - 1];
+            
+            // Update button states
+            userPrevBtn.classList.toggle('hidden', step === 1);
+            userNextBtn.textContent = step === totalUserSteps ? 'Submit' : 'Continue';
+          }
+
+          // Validate current step
+          function validateUserStep(step) {
+            const currentStepEl = document.getElementById(`user-step${step}`);
+            const requiredFields = currentStepEl.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+              if (!field.value.trim()) {
+                isValid = false;
+                field.classList.add('border-red-500');
+                
+                // Remove error styling when user starts typing/selecting
+                field.addEventListener('input', function() {
+                  this.classList.remove('border-red-500');
+                }, { once: true });
+              } else {
+                field.classList.remove('border-red-500');
+              }
+            });
+
+            // Special validation for benefits checkboxes in step 6
+            if (step === 6) {
+              const checkedBenefits = currentStepEl.querySelectorAll('input[type="checkbox"]:checked').length;
+              if (checkedBenefits > 3) {
+                isValid = false;
+                alert('Please select up to 3 benefits only');
+              }
+            }
+
+            return isValid;
+          }
+
+          // Handle next button click
+          userNextBtn.addEventListener('click', () => {
+            if (validateUserStep(currentUserStep)) {
+              if (currentUserStep === totalUserSteps) {
+                // Handle form submission
+                handleUserFormSubmission();
+              } else {
+                currentUserStep++;
+                showUserStep(currentUserStep);
+              }
+            }
+          });
+
+          // Handle previous button click
+          userPrevBtn.addEventListener('click', () => {
+            if (currentUserStep > 1) {
+              currentUserStep--;
+              showUserStep(currentUserStep);
+            }
+          });
+
+          // Handle form submission
+          function handleUserFormSubmission() {
+            const formData = new FormData(userForm);
+            const userData = Object.fromEntries(formData);
+            
+            // Log the data for now (replace with actual API call later)
+            console.log('User Registration Data:', userData);
+            
+            // Show success message
+            alert('Registration successful!');
+            
+            // You can redirect here if needed
+            // window.location.href = '/dashboard';
+          }
+
+          // Initialize form
+          showUserStep(1);
+
+          // Prevent form submission on enter key
+          userForm.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              return false;
+            }
+          });
+
+          // Handle checkbox limit for benefits
+          const benefitsContainer = document.querySelector('#user-step6');
+          if (benefitsContainer) {
+            const checkboxes = benefitsContainer.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+              checkbox.addEventListener('change', function() {
+                const checkedCount = benefitsContainer.querySelectorAll('input[type="checkbox"]:checked').length;
+                if (checkedCount > 3) {
+                  this.checked = false;
+                  alert('You can only select up to 3 benefits');
+                }
+              });
+            });
+          }
+        });
+    </script>
+</body>
+</html>
