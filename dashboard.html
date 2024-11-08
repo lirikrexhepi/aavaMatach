@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aava Match</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=general-sans@500,600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background: radial-gradient(
+            circle at 10% 20%,
+            rgba(0, 0, 0, 0.02) 0%,
+            transparent 8%
+          ),
+          radial-gradient(
+            circle at 90% 80%,
+            rgba(0, 0, 0, 0.02) 0%,
+            transparent 8%
+          ),
+          radial-gradient(
+            circle at 50% 50%,
+            rgba(0, 0, 0, 0.01) 0%,
+            transparent 100%
+          );
+        background-color: #ffffff;
+      }
+      .card {
+        position: absolute;
+        transition: transform 0.3s;
+        cursor: grab;
+        user-select: none;
+        touch-action: none;
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+      .card.dragging {
+        cursor: grabbing;
+        transition: none;
+      }
+      .swipe-indicator {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 82px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+      }
+      .swipe-indicator.visible {
+        opacity: 1;
+      }
+      .swipe-right {
+        color: #22c55e;
+      }
+      .swipe-left {
+        color: #ef4444;
+      }
+      .ai-bot {
+        width: 80px;
+        height: 80px;
+        background: #000;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+      }
+      .ai-face {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+      .ai-eyes {
+        display: flex;
+        gap: 22px;
+      }
+      .ai-eye {
+        width: 14px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+      }
+      .ai-smile {
+        width: 36px;
+        height: 20px;
+        background: transparent;
+        border: none;
+        position: relative;
+        overflow: visible;
+      }
+      .ai-smile::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 3px solid white;
+        border-color: transparent transparent white transparent;
+        border-radius: 0 0 100% 100%;
+        top: -5px;
+      }
+      .ai-message {
+        position: absolute;
+        left: 100px;
+        bottom: 90px;
+        background: white;
+        padding: 16px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        opacity: 0;
+        transition: opacity 0.3s, transform 0.3s;
+        transform: translateY(10px);
+        border: 1px solid #eee;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+        white-space: normal;
+        line-height: 1.5;
+        word-wrap: break-word;
+        min-width: 200px;
+        max-width: 500px;
+        width: auto;
+        height: auto;
+        overflow: visible;
+      }
+      .ai-message.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .ai-bot:hover .ai-message {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .chat-container {
+        position: fixed;
+        left: 140px;
+        bottom: 100px;
+        width: 300px;
+        height: 400px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        display: none;
+        flex-direction: column;
+        z-index: 1000;
+        border: 1px solid #eee;
+      }
+      .chat-container.active {
+        display: flex;
+      }
+      .chat-header {
+        padding: 16px;
+        border-bottom: 1px solid #eee;
+        font-weight: 500;
+      }
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chat-input-container {
+        padding: 16px;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 8px;
+      }
+      .chat-input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #eee;
+        border-radius: 20px;
+        outline: none;
+        font-size: 14px;
+      }
+      .chat-input:focus {
+        border-color: black;
+      }
+      .message {
+        padding: 8px 12px;
+        border-radius: 12px;
+        max-width: 80%;
+        font-size: 14px;
+      }
+      .user-message {
+        background: #f0f0f0;
+        align-self: flex-end;
+      }
+      .ai-message-chat {
+        background: #000;
+        color: white;
+        align-self: flex-start;
+      }
+      .ai-bot-container {
+        position: fixed;
+        left: 40px;
+        bottom: 40px;
+        z-index: 1000;
+      }
+      .ai-bot {
+        width: 80px;
+        height: 80px;
+        background: #000;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+      }
+      .ai-bot:hover {
+        transform: scale(1.05);
+      }
+      .ai-face {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+      }
+      .ai-eyes {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 8px;
+      }
+      .ai-eye {
+        width: 16px;
+        height: 16px;
+        background: white;
+        border-radius: 50%;
+        position: relative;
+        overflow: hidden;
+      }
+      .ai-pupil {
+        width: 6px;
+        height: 6px;
+        background: #000;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 0.05s;
+      }
+      .ai-smile {
+        width: 32px;
+        height: 16px;
+        border-radius: 50%;
+        border: 3px solid white;
+        border-top: none;
+        border-left: 3px solid white;
+        border-right: 3px solid white;
+        border-bottom: 3px solid white;
+        transform: translateY(-2px);
+      }
+      .ai-message {
+        position: absolute;
+        left: 100px;
+        bottom: 90px;
+        background: white;
+        padding: 12px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        opacity: 0;
+        transition: opacity 0.3s, transform 0.3s;
+        transform: translateY(10px);
+        white-space: nowrap;
+        border: 1px solid #eee;
+        width: 250px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      .ai-message.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .chat-container {
+        position: fixed;
+        left: 140px;
+        bottom: 100px;
+        width: 300px;
+        height: 400px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        display: none;
+        flex-direction: column;
+        z-index: 1000;
+        border: 1px solid #eee;
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      .chat-container.active {
+        display: flex;
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .chat-box {
+        position: absolute;
+        left: 100px;
+        bottom: 0;
+        background: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-size: 15px;
+        opacity: 0;
+        transition: all 0.3s ease;
+        transform: translateY(10px);
+        border: 2px solid #000;
+        width: 300px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+      }
+      .ai-bot-container:hover .chat-box {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .chat-input {
+        width: 100%;
+        border: none;
+        outline: none;
+        font-size: 15px;
+        background: transparent;
+      }
+      .ai-message::-webkit-scrollbar {
+        width: 6px;
+      }
+      .ai-message::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .ai-message::-webkit-scrollbar-thumb {
+        background: #ddd;
+        border-radius: 3px;
+      }
+      .ai-message::-webkit-scrollbar-thumb:hover {
+        background: #ccc;
+      }
+      .ai-message::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 20px;
+        background: linear-gradient(transparent, white);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .ai-message.has-overflow::after {
+        opacity: 1;
+      }
+      .chat-box {
+        width: 350px;
+        max-width: calc(100vw - 180px);
+      }
+      .background-shapes {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+      }
+      .shape {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 20s infinite linear;
+        transition: all 0.3s ease;
+      }
+      .shape-1 {
+        top: 15%;
+        left: 10%;
+        width: 150px;
+        height: 150px;
+        border: 3px solid #000;
+        border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+        background: rgba(0, 0, 0, 0.02);
+      }
+      .shape-2 {
+        top: 75%;
+        right: 15%;
+        width: 180px;
+        height: 180px;
+        border: 3px solid #000;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.02);
+      }
+      .shape-3 {
+        top: 30%;
+        right: 25%;
+        width: 120px;
+        height: 120px;
+        background: rgba(0, 0, 0, 0.05);
+        clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      }
+      .shape-4 {
+        bottom: 20%;
+        left: 20%;
+        width: 130px;
+        height: 130px;
+        background: rgba(0, 0, 0, 0.05);
+        clip-path: polygon(
+          25% 0%,
+          75% 0%,
+          100% 50%,
+          75% 100%,
+          25% 100%,
+          0% 50%
+        );
+      }
+      .grid-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(
+            rgba(0, 0, 0, 0.015) 1px,
+            transparent 1px
+          ),
+          linear-gradient(90deg, rgba(0, 0, 0, 0.015) 1px, transparent 1px);
+        background-size: 50px 50px;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+      }
+      @keyframes float {
+        0% {
+          transform: translate(0, 0) rotate(0deg) scale(1);
+        }
+        33% {
+          transform: translate(15px, -15px) rotate(120deg) scale(1.05);
+        }
+        66% {
+          transform: translate(-15px, 15px) rotate(240deg) scale(0.95);
+        }
+        100% {
+          transform: translate(0, 0) rotate(360deg) scale(1);
+        }
+      }
+      .shape::after {
+        content: "";
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: -5px;
+        bottom: -5px;
+        background: inherit;
+        filter: blur(5px);
+        opacity: 0.3;
+        z-index: -1;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.03), 0 2px 4px rgba(0, 0, 0, 0.06);
+      }
+      @media (max-width: 768px) {
+        .ai-message {
+          max-width: calc(100vw - 140px);
+          left: 90px;
+        }
+      }
+      .shape.swipe-right-glow {
+        background-color: rgba(
+          34,
+          197,
+          94,
+          0.15
+        ) !important; /* Brighter green */
+        border-color: rgba(34, 197, 94, 0.4) !important;
+        opacity: 0.2 !important; /* Increased visibility */
+      }
+      .shape.swipe-left-glow {
+        background-color: rgba(239, 68, 68, 0.15) !important; /* Brighter red */
+        border-color: rgba(239, 68, 68, 0.4) !important;
+        opacity: 0.2 !important; /* Increased visibility */
+      }
+      .shape-1,
+      .shape-2,
+      .shape-3,
+      .shape-4 {
+        transition: all 0.3s ease-in-out;
+      }
+
+      /* Add/update these styles */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      main {
+        min-height: 100vh;
+        width: 100%;
+        position: relative;
+      }
+
+      .cards-container {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      nav {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-family: "General Sans", sans-serif;
+        font-weight: 600;
+        font-size: 1.5rem;
+        letter-spacing: -0.02em;
+        color: #000;
+        text-decoration: none;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .nav-link {
+        font-family: "General Sans", sans-serif;
+        font-weight: 500;
+        font-size: 0.95rem;
+        color: #666;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        padding: 0.5rem 0;
+        position: relative;
+      }
+
+      .nav-link:hover {
+        color: #000;
+      }
+
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: #000;
+        transform: scaleX(0);
+        transition: transform 0.2s ease;
+      }
+
+      .nav-link:hover::after {
+        transform: scaleX(1);
+      }
+
+      /* Add space for centered logo */
+      .nav-spacer {
+        width: 100px; /* Adjust based on your needs */
+      }
+
+      /* Update existing container styles */
+      .background-shapes {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .grid-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      /* Ensure AI bot container stays above everything */
+      .ai-bot-container {
+        position: fixed;
+        left: 40px;
+        bottom: 40px;
+        z-index: 1000;
+      }
+
+      /* Responsive styles */
+      @media (max-width: 768px) {
+        .ai-bot-container {
+          left: 20px;
+          bottom: 20px;
+        }
+
+        .ai-bot {
+          width: 60px; /* Smaller bot on mobile */
+          height: 60px;
+        }
+
+        .ai-eye {
+          width: 14px; /* Smaller eyes */
+          height: 14px;
+        }
+
+        .ai-pupil {
+          width: 6px; /* Smaller pupils */
+          height: 6px;
+        }
+
+        .ai-smile {
+          width: 18px; /* Smaller mouth */
+          height: 2px;
+        }
+
+        .ai-message {
+          left: 90px;
+          max-width: calc(
+            100vw - 130px
+          ); /* Adjust width based on screen size */
+          font-size: 13px;
+          padding: 10px 16px;
+        }
+      }
+
+      /* Even smaller screens */
+      @media (max-width: 480px) {
+        .ai-bot-container {
+          left: 16px;
+          bottom: 16px;
+        }
+
+        .ai-bot {
+          width: 50px; /* Even smaller bot */
+          height: 50px;
+        }
+
+        .ai-eye {
+          width: 12px;
+          height: 12px;
+        }
+
+        .ai-pupil {
+          width: 5px;
+          height: 5px;
+        }
+
+        .ai-smile {
+          width: 16px;
+          height: 2px;
+        }
+
+        .ai-message {
+          left: 76px;
+          max-width: calc(100vw - 100px);
+          font-size: 12px;
+          padding: 8px 14px;
+        }
+      }
+
+      /* Ensure chat input is also responsive */
+      .chat-box {
+        position: absolute;
+        left: 100px;
+        bottom: 0;
+        background: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-size: 15px;
+        opacity: 0;
+        transition: all 0.3s ease;
+        transform: translateY(10px);
+        border: 2px solid #000;
+        width: 300px;
+        height: 50px;
+      }
+
+      @media (max-width: 768px) {
+        .chat-box {
+          left: 90px;
+          width: calc(100vw - 130px);
+          padding: 10px 16px;
+          height: 45px;
+          font-size: 14px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .chat-box {
+          left: 76px;
+          width: calc(100vw - 100px);
+          padding: 8px 14px;
+          height: 40px;
+          font-size: 13px;
+        }
+      }
+
+      /* Add these styles for vertical swipe indicators */
+      .swipe-indicator.swipe-up {
+        color: #9333ea; /* Purple for "Yeah but" */
+      }
+
+      .swipe-indicator.swipe-down {
+        color: #0ea5e9; /* Blue for "Need more info" */
+      }
+
+      /* Update the indicator colors */
+      .swipe-left {
+        color: #22c55e; /* Green for like */
+      }
+
+      .swipe-right {
+        color: #ef4444; /* Red for dislike */
+      }
+
+      .swipe-up {
+        color: #0ea5e9; /* Blue for "Need more info" */
+      }
+
+      .swipe-down {
+        color: #9333ea; /* Purple for "Yeah but" */
+      }
+
+      .swipe-instructions {
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 20px 0;
+        font-family: "General Sans", sans-serif;
+      }
+
+      .swipe-instructions p {
+        margin: 5px 0;
+      }
+
+      /* Make instructions responsive */
+      @media (max-width: 768px) {
+        .swipe-instructions {
+          font-size: 13px;
+          margin: 15px 0;
+        }
+      }
+
+      /* Define indicator colors */
+      :root {
+        --like-color: #15803d; /* Darker green for better visibility */
+        --dislike-color: #dc2626; /* Darker red */
+        --info-color: #0369a1; /* Darker blue */
+        --concern-color: #7e22ce; /* Darker purple */
+      }
+
+      /* Add color transition classes for blobs */
+      .shape.swipe-left-color {
+        opacity: 0.2;
+        background-color: var(--like-color) !important;
+        border-color: var(--like-color) !important;
+        filter: brightness(1.2);
+      }
+
+      .shape.swipe-right-color {
+        opacity: 0.2;
+        background-color: var(--dislike-color) !important;
+        border-color: var(--dislike-color) !important;
+        filter: brightness(1.2);
+      }
+
+      .shape.swipe-up-color {
+        opacity: 0.2;
+        background-color: var(--info-color) !important;
+        border-color: var(--info-color) !important;
+        filter: brightness(1.2);
+      }
+
+      .shape.swipe-down-color {
+        opacity: 0.2;
+        background-color: var(--concern-color) !important;
+        border-color: var(--concern-color) !important;
+        filter: brightness(1.2);
+      }
+
+      /* Add subtle glow effect */
+      .shape[class*="-color"] {
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Add styles for photos */
+      .workplace-photos {
+        margin-top: 20px;
+      }
+
+      .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .photo-grid img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      .photo-grid img:hover {
+        transform: scale(1.05);
+      }
+
+      /* Update company name style */
+      .card h2 {
+        font-family: "General Sans", sans-serif;
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 1rem;
+      }
+
+      /* Make it responsive */
+      @media (max-width: 768px) {
+        .photo-grid {
+          gap: 8px;
+        }
+
+        .photo-grid img {
+          height: 100px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .photo-grid img {
+          height: 80px;
+        }
+      }
+
+      /* Keep existing top nav styles */
+      .top-nav {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        height: 70px;
+        display: flex;
+        align-items: center;
+      }
+
+      /* Add bottom navigation styles */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        display: flex;
+        justify-content: space-around;
+        padding: 12px 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+      }
+
+      .bottom-nav-link {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: #666;
+        font-family: "General Sans", sans-serif;
+        font-size: 12px;
+        gap: 4px;
+        transition: color 0.2s ease;
+      }
+
+      .bottom-nav-link:hover {
+        color: #000;
+      }
+
+      .nav-icon {
+        width: 24px;
+        height: 24px;
+      }
+
+      /* Add padding to main content to account for bottom nav */
+      main {
+        padding-bottom: 70px;
+      }
+
+      /* Adjust AI bot position to not conflict with bottom nav */
+      .ai-bot-container {
+        bottom: 80px;
+      }
+
+      /* Make it responsive */
+      @media (max-width: 768px) {
+        .bottom-nav {
+          padding: 10px 0;
+        }
+
+        .nav-icon {
+          width: 22px;
+          height: 22px;
+        }
+      }
+
+      .ai-message a {
+        display: inline-block;
+        margin-top: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+
+      .ai-message a:hover {
+        transform: translateX(4px);
+      }
+
+      .wellness-popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 2000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .wellness-popup.active {
+        display: flex;
+        opacity: 1;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .wellness-popup-content {
+        background: white;
+        width: 90%;
+        max-width: 400px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+        overflow: hidden;
+      }
+
+      .wellness-popup.active .wellness-popup-content {
+        transform: translateY(0);
+      }
+
+      .wellness-popup-header {
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .wellness-popup-header h3 {
+        font-family: "General Sans", sans-serif;
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin: 0;
+      }
+
+      .close-popup {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #666;
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+      }
+
+      .close-popup:hover {
+        background: #f5f5f5;
+        color: #000;
+      }
+
+      .wellness-popup-body {
+        padding: 24px;
+      }
+
+      .wellness-popup-body p {
+        margin: 0 0 20px 0;
+        line-height: 1.5;
+        color: #333;
+      }
+
+      .wellness-link {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #000;
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+
+      .wellness-link:hover {
+        transform: translateX(4px);
+        background: #222;
+      }
+
+      @media (max-width: 480px) {
+        .wellness-popup-content {
+          width: 95%;
+        }
+
+        .wellness-popup-header {
+          padding: 16px;
+        }
+
+        .wellness-popup-body {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <nav class="top-nav">
+      <div class="nav-container">
+        <div class="nav-spacer"></div>
+        <a href="#" class="logo">aava match.</a>
+        <div class="nav-spacer"></div>
+      </div>
+    </nav>
+
+    <div class="bottom-nav">
+      <a href="#" class="bottom-nav-link">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="nav-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M21 3H3C2 3 1 4 1 5V19C1 20 2 21 3 21H21C22 21 23 20 23 19V5C23 4 22 3 21 3ZM12 18L3 11V5H21V11L12 18Z"
+          />
+        </svg>
+        Matches
+      </a>
+      <a href="#" class="bottom-nav-link">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="nav-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
+          />
+          <path
+            d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
+          />
+        </svg>
+        Profile
+      </a>
+      <a href="#" class="bottom-nav-link">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="nav-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+          />
+        </svg>
+        Review
+      </a>
+    </div>
+
+    <main class="max-w-2xl mx-auto px-6 py-12">
+      <div class="relative h-[600px] w-full">
+        <div
+          id="cards-container"
+          class="relative w-full h-full flex items-center justify-center"
+        >
+          <!-- Cards will be inserted here -->
+        </div>
+      </div>
+      <div class="text-center mt-8 text-gray-500">
+        <div class="swipe-instructions">
+          <p>Swipe left if you're interested, right if you're not</p>
+          <p>
+            Swipe down if more info is nessecary, up if its in your scope but
+            something is holding you back
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <div id="swipe-indicator" class="swipe-indicator">✓</div>
+
+    <div class="ai-bot-container">
+      <div class="ai-bot">
+        <div class="ai-face">
+          <div class="ai-eyes">
+            <div class="ai-eye">
+              <div class="ai-pupil"></div>
+            </div>
+            <div class="ai-eye">
+              <div class="ai-pupil"></div>
+            </div>
+          </div>
+          <div class="ai-smile"></div>
+        </div>
+      </div>
+      <div class="chat-box">
+        <input
+          type="text"
+          class="chat-input"
+          placeholder="Ask me anything... I'm here to help!"
+        />
+      </div>
+      <div class="ai-message">Hey! I'm your AI assistant 😊</div>
+    </div>
+
+    <div class="background-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <script>
+      const companies = [
+        {
+          name: "TechCorp Solutions",
+          type: "Technology",
+          size: "500+ employees",
+          location: "San Francisco, CA",
+          description:
+            "Leading software development company focused on AI and machine learning solutions.",
+          culture: "Fast-paced startup environment",
+          benefits: [
+            "Remote work",
+            "Flexible hours",
+            "Health insurance",
+            "Stock options",
+          ],
+        },
+        {
+          name: "Creative Minds Agency",
+          type: "Design & Marketing",
+          size: "50-200 employees",
+          location: "New York, NY",
+          description:
+            "Award-winning creative agency specializing in brand development and digital marketing.",
+          culture: "Collaborative and innovative",
+          benefits: [
+            "Hybrid work model",
+            "Creative workshops",
+            "Career development",
+          ],
+        },
+        {
+          name: "Global Finance Corp",
+          type: "Financial Services",
+          size: "1000+ employees",
+          location: "Chicago, IL",
+          description:
+            "Leading financial institution providing innovative solutions for global markets.",
+          culture: "Professional and structured",
+          benefits: [
+            "Competitive salary",
+            "Career advancement",
+            "Training programs",
+          ],
+        },
+        {
+          name: "Green Earth Solutions",
+          type: "Environmental Tech",
+          size: "100-500 employees",
+          location: "Seattle, WA",
+          description:
+            "Innovative company developing sustainable technologies for a greener future.",
+          culture: "Mission-driven and collaborative",
+          benefits: [
+            "Impact bonus",
+            "Sustainable initiatives",
+            "Work-life balance",
+          ],
+        },
+        {
+          name: "HealthTech Innovations",
+          type: "Healthcare Technology",
+          size: "200-500 employees",
+          location: "Boston, MA",
+          description:
+            "Revolutionizing healthcare through digital solutions and telemedicine platforms.",
+          culture: "Research-oriented and impactful",
+          benefits: [
+            "Medical coverage",
+            "Research funding",
+            "Flexible schedule",
+          ],
+        },
+        {
+          name: "DataDrive Analytics",
+          type: "Data Science",
+          size: "50-200 employees",
+          location: "Austin, TX",
+          description:
+            "Data analytics firm helping businesses make data-driven decisions through AI and ML.",
+          culture: "Technical and innovative",
+          benefits: ["Remote-first", "Learning budget", "Latest tech stack"],
+        },
+        {
+          name: "Future Robotics",
+          type: "Robotics",
+          size: "100-300 employees",
+          location: "Denver, CO",
+          description:
+            "Developing next-generation robotics solutions for manufacturing and automation.",
+          culture: "Experimental and cutting-edge",
+          benefits: ["Lab access", "Patent bonuses", "Flexible hours"],
+        },
+        {
+          name: "EduTech Plus",
+          type: "Education Technology",
+          size: "100-500 employees",
+          location: "Portland, OR",
+          description:
+            "Creating innovative learning platforms and tools for modern education.",
+          culture: "Learning-focused and inclusive",
+          benefits: [
+            "Education reimbursement",
+            "Remote work",
+            "Wellness programs",
+          ],
+        },
+        {
+          name: "Cloud Security Pro",
+          type: "Cybersecurity",
+          size: "100-300 employees",
+          location: "Raleigh, NC",
+          description:
+            "Providing cutting-edge cloud security solutions for enterprise clients.",
+          culture: "Security-focused and detail-oriented",
+          benefits: [
+            "Certification support",
+            "Remote work",
+            "Premium healthcare",
+          ],
+        },
+        {
+          name: "Digital Media Hub",
+          type: "Media & Entertainment",
+          size: "300-700 employees",
+          location: "Los Angeles, CA",
+          description:
+            "Creating next-generation digital media platforms and content solutions.",
+          culture: "Creative and fast-paced",
+          benefits: [
+            "Creative freedom",
+            "Industry events",
+            "Equipment allowance",
+          ],
+        },
+        {
+          name: "Smart Home Systems",
+          type: "IoT Technology",
+          size: "100-300 employees",
+          location: "Minneapolis, MN",
+          description:
+            "Building intelligent home automation solutions for the modern lifestyle.",
+          culture: "User-focused and innovative",
+          benefits: [
+            "Product discounts",
+            "Home office setup",
+            "Wellness program",
+          ],
+        },
+        {
+          name: "Quantum Computing Labs",
+          type: "Advanced Technology",
+          size: "50-200 employees",
+          location: "Berkeley, CA",
+          description:
+            "Pioneering quantum computing solutions for complex computational problems.",
+          culture: "Research-intensive and innovative",
+          benefits: [
+            "Research grants",
+            "Conference budget",
+            "Publication support",
+          ],
+        },
+        {
+          name: "Urban Mobility Tech",
+          type: "Transportation",
+          size: "200-500 employees",
+          location: "Miami, FL",
+          description:
+            "Developing smart solutions for urban transportation and mobility challenges.",
+          culture: "Dynamic and solution-focused",
+          benefits: ["Transit benefits", "Equity package", "Flexible work"],
+        },
+        {
+          name: "Social Impact Hub",
+          type: "Non-Profit Tech",
+          size: "20-100 employees",
+          location: "Washington, DC",
+          description:
+            "Technology solutions for social good, focusing on community impact and sustainability.",
+          culture: "Purpose-driven and collaborative",
+          benefits: [
+            "Flexible schedule",
+            "Volunteer time",
+            "Professional development",
+          ],
+        },
+        {
+          name: "AI Research Co",
+          type: "Artificial Intelligence",
+          size: "100-300 employees",
+          location: "Cambridge, MA",
+          description:
+            "Advancing the boundaries of artificial intelligence and machine learning research.",
+          culture: "Research-focused and collaborative",
+          benefits: [
+            "Research stipend",
+            "Conference travel",
+            "Publication bonus",
+          ],
+        },
+        {
+          name: "BlockChain Solutions",
+          type: "Blockchain Technology",
+          size: "50-200 employees",
+          location: "Miami, FL",
+          description:
+            "Building next-generation blockchain solutions for financial and enterprise applications.",
+          culture: "Innovative and decentralized",
+          benefits: ["Crypto payments", "Remote work", "Flexible hours"],
+        },
+        {
+          name: "Game Dev Studios",
+          type: "Gaming Technology",
+          size: "200-500 employees",
+          location: "Seattle, WA",
+          description:
+            "Creating immersive gaming experiences using cutting-edge technology.",
+          culture: "Creative and playful",
+          benefits: ["Game library", "Creative workshops", "Gaming setup"],
+        },
+        {
+          name: "BioTech Innovations",
+          type: "Biotechnology",
+          size: "300-600 employees",
+          location: "San Diego, CA",
+          description:
+            "Developing innovative biotechnology solutions for healthcare and research.",
+          culture: "Research-driven and precise",
+          benefits: ["Health benefits", "Research funding", "Lab access"],
+        },
+        {
+          name: "Space Tech Systems",
+          type: "Space Technology",
+          size: "100-300 employees",
+          location: "Houston, TX",
+          description:
+            "Advancing space exploration through innovative technology solutions.",
+          culture: "Pioneering and ambitious",
+          benefits: [
+            "Space program access",
+            "Research opportunities",
+            "Advanced equipment",
+          ],
+        },
+        {
+          name: "Clean Energy Corp",
+          type: "Renewable Energy",
+          size: "200-500 employees",
+          location: "Denver, CO",
+          description:
+            "Developing sustainable energy solutions for a cleaner future.",
+          culture: "Environmentally conscious and innovative",
+          benefits: ["Green initiatives", "Sustainable bonus", "Remote work"],
+        },
+      ];
+
+      // Eye following cursor functionality
+      document.addEventListener("mousemove", (e) => {
+        const eyes = document.querySelectorAll(".ai-pupil");
+        eyes.forEach((eye) => {
+          const rect = eye.parentElement.getBoundingClientRect();
+          const eyeCenterX = rect.left + rect.width / 2;
+          const eyeCenterY = rect.top + rect.height / 2;
+
+          const angle = Math.atan2(
+            e.clientY - eyeCenterY,
+            e.clientX - eyeCenterX
+          );
+          const distance = Math.min(
+            4,
+            Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) / 20
+          );
+
+          const x = Math.cos(angle) * distance;
+          const y = Math.sin(angle) * distance;
+
+          eye.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        });
+      });
+
+      // Rest of your JavaScript (card swiping, chat functionality, etc.)
+      let currentIndex = 0;
+
+      function createCard(company) {
+        return `
+          <div class="card w-full max-w-lg bg-white border rounded-xl p-6 shadow-lg">
+            <div class="mb-4">
+              <h2 class="text-2xl font-semibold mb-1">${company.name}</h2>
+              <p class="text-gray-500">${company.type} · ${company.location}</p>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <h3 class="font-medium mb-2">About</h3>
+                <p class="text-gray-600">${company.description}</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium mb-2">Company Culture</h3>
+                <p class="text-gray-600">${company.culture}</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium mb-2">Benefits</h3>
+                <div class="flex flex-wrap gap-2">
+                  ${company.benefits
+                    .map(
+                      (benefit) =>
+                        `<span class="px-3 py-1 bg-gray-100 rounded-full text-sm">${benefit}</span>`
+                    )
+                    .join("")}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Initialize cards
+      function initializeCards() {
+        const container = document.getElementById("cards-container");
+        container.innerHTML = "";
+
+        if (currentIndex < companies.length) {
+          container.innerHTML = createCard(companies[currentIndex]);
+          const card = document.querySelector(".card");
+          makeSwipeable(card);
+        } else {
+          container.innerHTML = `
+            <div class="text-center text-gray-500">
+              <p class="text-xl">No more companies to show</p>
+              <p class="mt-2">Check your matches or come back later</p>
+            </div>
+          `;
+        }
+      }
+
+      // Initialize when page loads
+      initializeCards();
+
+      // Add this after the previous JavaScript code
+      function makeSwipeable(element) {
+        let isDragging = false;
+        let startPos = { x: 0, y: 0 };
+        let currentTranslate = { x: 0, y: 0 };
+        const indicator = document.getElementById("swipe-indicator");
+
+        element.addEventListener("mousedown", startDragging);
+        element.addEventListener("touchstart", startDragging, {
+          passive: false,
+        });
+        window.addEventListener("mousemove", drag);
+        window.addEventListener("touchmove", drag, { passive: false });
+        window.addEventListener("mouseup", stopDragging);
+        window.addEventListener("touchend", stopDragging);
+
+        function startDragging(e) {
+          isDragging = true;
+          element.classList.add("dragging");
+
+          const pos = getEventPosition(e);
+          startPos.x = pos.x - currentTranslate.x;
+          startPos.y = pos.y - currentTranslate.y;
+        }
+
+        function drag(e) {
+          if (!isDragging) return;
+          e.preventDefault();
+
+          const pos = getEventPosition(e);
+          currentTranslate.x = pos.x - startPos.x;
+          currentTranslate.y = pos.y - startPos.y;
+
+          const shapes = document.querySelectorAll(".shape");
+
+          // Remove all previous color classes
+          shapes.forEach((shape) => {
+            shape.classList.remove(
+              "swipe-left-color",
+              "swipe-right-color",
+              "swipe-up-color",
+              "swipe-down-color"
+            );
+          });
+
+          // Horizontal swipe indicators and blob colors
+          if (
+            Math.abs(currentTranslate.x) > Math.abs(currentTranslate.y) &&
+            Math.abs(currentTranslate.x) > 100
+          ) {
+            indicator.textContent = currentTranslate.x > 0 ? "✕" : "✓";
+            indicator.className =
+              "swipe-indicator visible " +
+              (currentTranslate.x > 0 ? "swipe-right" : "swipe-left");
+
+            // Add color to blobs
+            shapes.forEach((shape) => {
+              shape.classList.add(
+                currentTranslate.x > 0
+                  ? "swipe-right-color"
+                  : "swipe-left-color"
+              );
+            });
+          }
+          // Vertical swipe indicators and blob colors
+          else if (
+            Math.abs(currentTranslate.y) > Math.abs(currentTranslate.x) &&
+            Math.abs(currentTranslate.y) > 100
+          ) {
+            indicator.textContent = currentTranslate.y < 0 ? "!" : "?";
+            indicator.className =
+              "swipe-indicator visible " +
+              (currentTranslate.y < 0 ? "swipe-up" : "swipe-down");
+
+            // Add color to blobs
+            shapes.forEach((shape) => {
+              shape.classList.add(
+                currentTranslate.y < 0 ? "swipe-up-color" : "swipe-down-color"
+              );
+            });
+          } else {
+            indicator.className = "swipe-indicator";
+          }
+
+          const rotation = currentTranslate.x * 0.1;
+          element.style.transform = `translate(${currentTranslate.x}px, ${currentTranslate.y}px) rotate(${rotation}deg)`;
+        }
+
+        function stopDragging() {
+          if (!isDragging) return;
+          isDragging = false;
+          element.classList.remove("dragging");
+
+          const shapes = document.querySelectorAll(".shape");
+
+          // Reset blob colors with delay
+          setTimeout(() => {
+            shapes.forEach((shape) => {
+              shape.classList.remove(
+                "swipe-left-color",
+                "swipe-right-color",
+                "swipe-up-color",
+                "swipe-down-color"
+              );
+            });
+          }, 300);
+
+          const isHorizontal =
+            Math.abs(currentTranslate.x) > Math.abs(currentTranslate.y);
+          const threshold = 100;
+
+          if (isHorizontal && Math.abs(currentTranslate.x) > threshold) {
+            const isRejection = currentTranslate.x > 0;
+            const direction = currentTranslate.x > 0 ? 1 : -1;
+
+            element.style.transform = `translate(${
+              direction * window.innerWidth
+            }px, ${currentTranslate.y}px)`;
+            showAiMessage(currentTranslate.x > 0 ? "right" : "left");
+
+            if (isRejection) {
+              rejectionCount++;
+              checkWellnessPrompts();
+            } else {
+              matchCount++;
+            }
+
+            // Hide indicator after successful swipe
+            setTimeout(() => {
+              indicator.className = "swipe-indicator";
+            }, 200);
+          } else if (
+            !isHorizontal &&
+            Math.abs(currentTranslate.y) > threshold
+          ) {
+            const direction = currentTranslate.y > 0 ? 1 : -1;
+            element.style.transform = `translate(${currentTranslate.x}px, ${
+              direction * window.innerHeight
+            }px)`;
+            showAiMessage(currentTranslate.y < 0 ? "up" : "down");
+
+            // Hide indicator after successful swipe
+            setTimeout(() => {
+              indicator.className = "swipe-indicator";
+            }, 200);
+          } else {
+            element.style.transform = "translate(0px, 0px) rotate(0deg)";
+            // Hide indicator immediately if no successful swipe
+            indicator.className = "swipe-indicator";
+          }
+
+          setTimeout(() => {
+            if (
+              Math.abs(currentTranslate.x) > threshold ||
+              Math.abs(currentTranslate.y) > threshold
+            ) {
+              currentIndex++;
+              initializeCards();
+            }
+            currentTranslate = { x: 0, y: 0 };
+          }, 300);
+        }
+
+        function getEventPosition(e) {
+          return {
+            x: e.type.includes("touch") ? e.touches[0].pageX : e.pageX,
+            y: e.type.includes("touch") ? e.touches[0].pageY : e.pageY,
+          };
+        }
+      }
+
+      // AI message functionality
+      function showAiMessage(direction) {
+        const messages = {
+          left: [
+            "Great choice! They look promising! 👍",
+            "I can see why you liked them! ✨",
+            "That's a solid match! 🎯",
+            "Good decision! They have potential! 🌟",
+          ],
+          right: [
+            "No worries, plenty more to see! 👀",
+            "Not the right fit? Let's keep looking! 🔍",
+            "Next one might be better! ⭐",
+            "I understand, let's find a better match! 💫",
+          ],
+          up: [
+            "Let me find more details for you! 📚",
+            "I'll get you more information! 🔎",
+            "Want to know the specifics? I got you! 📝",
+            "Let's explore this opportunity further! 🤓",
+          ],
+          down: [
+            "Interested but cautious? Let's discuss! 🤔",
+            "What's holding you back? Let me know! 💭",
+            "Want to explore your concerns? 🔍",
+            "We can address any hesitations! 💡",
+          ],
+        };
+
+        const aiMessage = document.querySelector(".ai-message");
+        const messageArray = messages[direction];
+        const randomMessage =
+          messageArray[Math.floor(Math.random() * messageArray.length)];
+
+        aiMessage.textContent = randomMessage;
+        aiMessage.classList.add("visible");
+
+        setTimeout(() => {
+          aiMessage.classList.remove("visible");
+        }, 3500);
+      }
+
+      // Make sure to add these styles if they're not already in your CSS
+
+      // Add this JavaScript code
+      async function getAIResponse(userInput) {
+        const API_TOKEN = "hf_xxx"; // You'll need to get a free token from HuggingFace
+        const API_URL =
+          "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill";
+
+        try {
+          const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${API_TOKEN}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ inputs: userInput }),
+          });
+
+          const result = await response.json();
+          return result[0].generated_text;
+        } catch (error) {
+          console.error("Error:", error);
+          return "Sorry, I'm having trouble connecting right now. Please try again later!";
+        }
+      }
+
+      // Update the chat input event listener
+      document
+        .querySelector(".chat-input")
+        .addEventListener("keypress", async function (e) {
+          if (e.key === "Enter" && this.value.trim()) {
+            const userInput = this.value.trim();
+            this.value = "";
+
+            // Show user's message
+            const aiMessage = document.querySelector(".ai-message");
+            aiMessage.textContent = "Thinking...";
+            aiMessage.classList.add("visible");
+
+            // Get AI response
+            const response = await getAIResponse(userInput);
+
+            // Show AI response
+            aiMessage.textContent = response;
+
+            // Hide message after 5 seconds
+            setTimeout(() => {
+              aiMessage.classList.remove("visible");
+            }, 5000);
+          }
+        });
+
+      // Function to check if message has overflow and add fade effect
+      function checkMessageOverflow() {
+        const message = document.querySelector(".ai-message");
+        if (message.scrollHeight > message.clientHeight) {
+          message.classList.add("has-overflow");
+        } else {
+          message.classList.remove("has-overflow");
+        }
+      }
+
+      // Update the AI response handler
+      document
+        .querySelector(".chat-input")
+        .addEventListener("keypress", async function (e) {
+          if (e.key === "Enter" && this.value.trim()) {
+            const userInput = this.value.trim();
+            this.value = "";
+
+            const aiMessage = document.querySelector(".ai-message");
+            aiMessage.textContent = "Thinking...";
+            aiMessage.classList.add("visible");
+
+            const response = await getAIResponse(userInput);
+            aiMessage.textContent = response;
+
+            // Check for overflow after setting new content
+            checkMessageOverflow();
+
+            setTimeout(() => {
+              aiMessage.classList.remove("visible");
+            }, 5000);
+          }
+        });
+
+      // Optional: Add resize handler if needed
+      window.addEventListener("resize", checkMessageOverflow);
+
+      function calculateWellnessMatch(employee, company) {
+        const factors = [
+          "mental_health_benefits",
+          "work_life_balance",
+          "stress_levels",
+          "management_style",
+          "growth_opportunities",
+        ];
+
+        let matchScore = 0;
+        factors.forEach((factor) => {
+          if (employee.preferences[factor] === company.offerings[factor]) {
+            matchScore += 20; // Each factor worth 20 points
+          }
+        });
+
+        return matchScore; // Out of 100
+      }
+
+      const wellnessFactors = {
+        workLifeBalance: {
+          flexible_hours: true,
+          remote_options: true,
+          vacation_policy: "unlimited",
+          mental_health_days: 12,
+        },
+        supportPrograms: {
+          counseling: true,
+          mentorship: true,
+          peer_support: true,
+          wellness_budget: 1000,
+        },
+        workplaceEnvironment: {
+          quiet_spaces: true,
+          stress_management: true,
+          team_building: true,
+        },
+      };
+
+      // Add to your card generation function
+      function generateRandomCompanyId() {
+        return Math.floor(Math.random() * 9000) + 1000; // Generate 4-digit number
+      }
+
+      // Update your card data
+      const cardData = [
+        {
+          companyId: generateRandomCompanyId(),
+          jobTitle: "Senior Software Engineer",
+          salary: "120,000 - 150,000",
+          benefits: [
+            "Flexible Hours",
+            "Remote Work Options",
+            "Health Insurance",
+            "401k Match",
+            "Professional Development",
+          ],
+        },
+        // Add more card data...
+      ];
+
+      // Add this after the companies array
+      const wellnessPrompts = {
+        highRejectionRate: [
+          "I notice you've passed on several opportunities. Would you like to discuss what you're looking for in your ideal role?",
+          "Sometimes job searching can be stressful. Did you know Aava offers career counseling services?",
+          "Finding the right fit takes time. Aava's wellness experts can help you navigate this journey.",
+        ],
+        noMatches: [
+          "Still searching for the perfect match? Aava's career counselors can help clarify your professional goals.",
+          "Taking care of your wellbeing is important during job searches. Aava offers support services that might help.",
+        ],
+        stressSignals: [
+          "Job searching can be overwhelming. Would you like to learn about Aava's wellness resources?",
+          "Taking care of yourself is crucial during career transitions. Aava's specialists are here to help.",
+        ],
+      };
+
+      // Add these tracking variables
+      let rejectionCount = 0;
+      let matchCount = 0;
+      const REJECTION_THRESHOLD = 5;
+
+      // Add this new function
+      function checkWellnessPrompts() {
+        if (rejectionCount >= REJECTION_THRESHOLD) {
+          const randomPrompt =
+            wellnessPrompts.highRejectionRate[
+              Math.floor(
+                Math.random() * wellnessPrompts.highRejectionRate.length
+              )
+            ];
+
+          showWellnessPopup(
+            randomPrompt,
+            "https://www.aava.fi/en/services/mental-health",
+            "Explore wellness services →"
+          );
+
+          // Reset counter
+          rejectionCount = 0;
+        }
+
+        if (currentIndex >= companies.length - 1 && matchCount === 0) {
+          const noMatchPrompt =
+            wellnessPrompts.noMatches[
+              Math.floor(Math.random() * wellnessPrompts.noMatches.length)
+            ];
+
+          showWellnessPopup(
+            noMatchPrompt,
+            "https://www.aava.fi/en/services",
+            "Discover Aava services →"
+          );
+        }
+      }
+
+      // Add this new function to handle the popup
+      function showWellnessPopup(message, link, linkText) {
+        const popup = document.getElementById("wellness-popup");
+        const messageEl = document.getElementById("wellness-message");
+        const linkEl = document.getElementById("wellness-link");
+
+        messageEl.textContent = message;
+        linkEl.href = link;
+        linkEl.textContent = linkText;
+
+        popup.classList.add("active");
+
+        // Add event listeners
+        const closeBtn = popup.querySelector(".close-popup");
+        const closePopup = () => {
+          popup.classList.remove("active");
+        };
+
+        closeBtn.addEventListener("click", closePopup);
+        popup.addEventListener("click", (e) => {
+          if (e.target === popup) closePopup();
+        });
+
+        // Remove event listeners after popup is closed
+        popup.addEventListener("transitionend", () => {
+          if (!popup.classList.contains("active")) {
+            closeBtn.removeEventListener("click", closePopup);
+            popup.removeEventListener("click", closePopup);
+          }
+        });
+      }
+    </script>
+
+    <!-- Add this HTML right before the closing </body> tag -->
+    <div id="wellness-popup" class="wellness-popup">
+      <div class="wellness-popup-content">
+        <div class="wellness-popup-header">
+          <h3>Taking Care of You</h3>
+          <button class="close-popup">×</button>
+        </div>
+        <div class="wellness-popup-body">
+          <p id="wellness-message"></p>
+          <a href="" id="wellness-link" class="wellness-link" target="_blank">
+            Learn more →
+          </a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

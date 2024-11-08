@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Questionnaire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .option-button.selected {
+        border-color: black;
+        background-color: black;
+        color: white;
+      }
+      .option-button.selected p {
+        color: #e5e5e5;
+      }
+      .question-slide {
+        display: none;
+      }
+      .question-slide.active {
+        display: block;
+      }
+      .field-selection-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .field-selection-container h2 {
+        text-align: center;
+        margin-bottom: 40px;
+        font-size: 1.8rem;
+        font-weight: 600;
+      }
+
+      .fields-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 20px;
+      }
+
+      .field-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      .field-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+        border-color: #000;
+      }
+
+      .field-icon {
+        font-size: 2.5rem;
+        margin-bottom: 12px;
+      }
+
+      .field-card h3 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .subfields-preview {
+        font-size: 0.9rem;
+        color: #666;
+        line-height: 1.4;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      @media (max-width: 768px) {
+        .fields-grid {
+          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+          gap: 15px;
+          padding: 15px;
+        }
+        
+        .field-card {
+          padding: 20px;
+        }
+      }
+
+      .option-button {
+        transition: all 0.3s ease;
+      }
+      
+      .option-button:hover {
+        transform: translateY(-2px);
+      }
+      
+      @media (max-width: 768px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-white min-h-screen p-6">
+    <!-- Progress bar -->
+    <div class="max-w-2xl mx-auto mb-12 pt-8">
+      <div class="w-full bg-gray-100 h-1 rounded-full">
+        <div
+          id="progress-bar"
+          class="bg-black h-1 rounded-full transition-all duration-300"
+          style="width: 0%"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Question Container -->
+    <div class="max-w-2xl mx-auto" id="questionnaire-container"></div>
+
+    <script>
+      const questions = [
+        {
+          question: "Which industry interests you most?",
+          type: "grid",
+          options: [
+            {
+              title: "Technology & Software",
+              description: "Software Development, IT, Cybersecurity, Data Science",
+              icon: "💻"
+            },
+            {
+              title: "Healthcare & Medical",
+              description: "Healthcare Services, Medical Research, Biotech",
+              icon: "🏥"
+            },
+            {
+              title: "Finance & Banking",
+              description: "Banking, Investment, Insurance, Fintech",
+              icon: "💰"
+            },
+            {
+              title: "Marketing & Media",
+              description: "Digital Marketing, Advertising, Social Media",
+              icon: "📱"
+            },
+            {
+              title: "Engineering & Manufacturing",
+              description: "Manufacturing, Construction, Engineering",
+              icon: "⚙️"
+            },
+            {
+              title: "Creative & Design",
+              description: "UI/UX, Graphic Design, Content Creation",
+              icon: "🎨"
+            },
+            {
+              title: "Education & Research",
+              description: "Teaching, Academic Research, EdTech",
+              icon: "📚"
+            },
+            {
+              title: "Business Services",
+              description: "Consulting, Management, HR, Sales",
+              icon: "👥"
+            },
+            {
+              title: "Legal & Law",
+              description: "Legal Services, Compliance, Policy",
+              icon: "⚖️"
+            },
+            {
+              title: "Hospitality & Tourism",
+              description: "Hotels, Travel, Food Services",
+              icon: "🏨"
+            },
+            {
+              title: "Environmental & Sustainability",
+              description: "Green Energy, Conservation, Climate Tech",
+              icon: "🌱"
+            },
+            {
+              title: "Public & Social Services",
+              description: "Government, Non-profit, Social Work",
+              icon: "🤝"
+            }
+          ],
+        },
+        {
+          question: "What's your preferred work environment?",
+          options: [
+            {
+              title: "Corporate Office",
+              description:
+                "Traditional, structured environment with clear hierarchy",
+            },
+            {
+              title: "Startup Culture",
+              description: "Fast-paced, flexible, and innovative workspace",
+            },
+            {
+              title: "Remote Work",
+              description: "Working from home or anywhere in the world",
+            },
+            {
+              title: "Hybrid Setup",
+              description: "Mix of office and remote work",
+            },
+          ],
+        },
+        {
+          question: "Which work style suits you best?",
+          options: [
+            {
+              title: "Independent Worker",
+              description: "Prefer working on tasks individually",
+            },
+            {
+              title: "Team Player",
+              description: "Thrive in collaborative environments",
+            },
+            {
+              title: "Leadership Role",
+              description: "Enjoy guiding and managing others",
+            },
+            {
+              title: "Project-Based",
+              description: "Focus on specific projects with clear deadlines",
+            },
+          ],
+        },
+        {
+          question: "What's your ideal company size?",
+          options: [
+            { title: "Small Business", description: "Less than 50 employees" },
+            { title: "Mid-sized Company", description: "50-500 employees" },
+            { title: "Large Corporation", description: "500+ employees" },
+            {
+              title: "Freelance/Independent",
+              description: "Working with multiple clients",
+            },
+          ],
+        },
+        {
+          question: "What motivates you most at work?",
+          options: [
+            {
+              title: "Financial Growth",
+              description: "Competitive salary and benefits",
+            },
+            {
+              title: "Career Development",
+              description: "Learning and advancement opportunities",
+            },
+            {
+              title: "Work-Life Balance",
+              description: "Flexible hours and personal time",
+            },
+            {
+              title: "Impact & Purpose",
+              description: "Making a difference in society",
+            },
+          ],
+        },
+        {
+          question: "What's your preferred pace of work?",
+          options: [
+            {
+              title: "Fast-paced",
+              description: "Quick decisions, multiple deadlines",
+            },
+            {
+              title: "Steady & Structured",
+              description: "Consistent, predictable workflow",
+            },
+            {
+              title: "Project-based",
+              description: "Varying intensity with clear milestones",
+            },
+            {
+              title: "Flexible",
+              description: "Self-managed schedule and priorities",
+            },
+          ],
+        },
+        {
+          question: "What type of challenges excite you?",
+          options: [
+            {
+              title: "Technical Problems",
+              description: "Solving complex technical issues",
+            },
+            {
+              title: "Creative Challenges",
+              description: "Coming up with innovative solutions",
+            },
+            {
+              title: "People Management",
+              description: "Handling team dynamics and development",
+            },
+            {
+              title: "Strategic Planning",
+              description: "Long-term vision and execution",
+            },
+          ],
+        },
+        {
+          question: "What's your ideal career growth path?",
+          options: [
+            {
+              title: "Technical Expert",
+              description: "Deepening expertise in specific field",
+            },
+            {
+              title: "Management Track",
+              description: "Leading teams and departments",
+            },
+            {
+              title: "Entrepreneurial",
+              description: "Starting or growing business ventures",
+            },
+            {
+              title: "Project Leadership",
+              description: "Managing key initiatives and programs",
+            },
+          ],
+        },
+      ];
+
+      let currentQuestion = 0;
+      const container = document.getElementById("questionnaire-container");
+
+      function createQuestionSlide(questionData, index) {
+        if (questionData.type === "grid") {
+          return `
+            <div class="question-slide ${index === 0 ? "active" : ""}" id="q${index + 1}">
+              <h2 class="text-3xl font-semibold text-black mb-8">${questionData.question}</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                ${questionData.options
+                  .map(
+                    (option) => `
+                  <button class="option-button text-left p-4 border border-gray-200 rounded-xl hover:border-black transition-all hover:shadow-lg">
+                    <div class="flex items-center gap-3 mb-3">
+                      <span class="text-3xl">${option.icon}</span>
+                      <span class="font-medium">${option.title}</span>
+                    </div>
+                    <p class="text-sm text-gray-500">${option.description}</p>
+                  </button>
+                `
+                  )
+                  .join("")}
+              </div>
+
+              <div class="mt-8 flex justify-between items-center">
+                <button class="back-btn text-gray-400 hover:text-black transition-colors font-medium" 
+                        ${index === 0 ? 'style="visibility: hidden;"' : ""}>
+                  Back
+                </button>
+                <button class="continue-btn px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors font-medium">
+                  ${index === questions.length - 1 ? "Finish" : "Continue"}
+                </button>
+              </div>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="question-slide ${index === 0 ? "active" : ""}" id="q${
+            index + 1
+          }">
+              <h2 class="text-3xl font-semibold text-black mb-8">${
+                questionData.question
+              }</h2>
+              <div class="grid grid-cols-1 gap-4">
+                ${questionData.options
+                  .map(
+                    (option) => `
+                  <button class="option-button text-left px-6 py-4 border border-gray-200 rounded-xl hover:border-black transition-colors">
+                    <span class="font-medium">${option.title}</span>
+                    <p class="text-sm text-gray-500 mt-1">${option.description}</p>
+                  </button>
+                `
+                  )
+                  .join("")}
+              </div>
+
+              <div class="mt-12 flex justify-between items-center">
+                <button class="back-btn text-gray-400 hover:text-black transition-colors font-medium" 
+                        ${index === 0 ? 'style="visibility: hidden;"' : ""}>
+                  Back
+                </button>
+                <button class="continue-btn px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors font-medium">
+                  ${index === questions.length - 1 ? "Finish" : "Continue"}
+                </button>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      // Initialize questionnaire
+      function initQuestionnaire() {
+        // Create all question slides
+        questions.forEach((q, index) => {
+          container.innerHTML += createQuestionSlide(q, index);
+        });
+
+        // Add event listeners
+        document.querySelectorAll(".option-button").forEach((button) => {
+          button.addEventListener("click", function () {
+            const parent = this.closest(".grid");
+            parent.querySelectorAll(".option-button").forEach((btn) => {
+              btn.classList.remove("selected");
+            });
+            this.classList.add("selected");
+          });
+        });
+
+        document.querySelectorAll(".continue-btn").forEach((button) => {
+          button.addEventListener("click", nextQuestion);
+        });
+
+        document.querySelectorAll(".back-btn").forEach((button) => {
+          button.addEventListener("click", previousQuestion);
+        });
+
+        // Set initial progress
+        updateProgressBar();
+      }
+
+      function nextQuestion() {
+        if (currentQuestion < questions.length - 1) {
+          document
+            .querySelector(`#q${currentQuestion + 1}`)
+            .classList.remove("active");
+          currentQuestion++;
+          document
+            .querySelector(`#q${currentQuestion + 1}`)
+            .classList.add("active");
+          updateProgressBar();
+        } else {
+          // Redirect to dashboard instead of showing alert
+          window.location.href = "dashboard.html";
+        }
+      }
+
+      function previousQuestion() {
+        if (currentQuestion > 0) {
+          document
+            .querySelector(`#q${currentQuestion + 1}`)
+            .classList.remove("active");
+          currentQuestion--;
+          document
+            .querySelector(`#q${currentQuestion + 1}`)
+            .classList.add("active");
+          updateProgressBar();
+        }
+      }
+
+      function updateProgressBar() {
+        const progress = ((currentQuestion + 1) / questions.length) * 100;
+        document.getElementById("progress-bar").style.width = `${progress}%`;
+      }
+
+      // Initialize the questionnaire when the page loads
+      initQuestionnaire();
+    </script>
+  </body>
+</html>
