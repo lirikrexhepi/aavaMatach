@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bubble {
+            position: absolute;
+            width: var(--size);
+            height: var(--size);
+            left: var(--left);
+            top: var(--top);
+            background: rgba(100, 149, 237, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease-out;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(100, 149, 237, 0.3);
+            transform: skew(var(--skew));
+        }
+
+        .bubble.rounded-lg {
+            border-radius: 30%;
+        }
+
+        .bubble:hover {
+            transform: scale(1.1) skew(var(--skew));
+            background: rgba(100, 149, 237, 0.3);
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg) skew(var(--skew)); }
+            33% { transform: translate(10px, -10px) rotate(2deg) skew(var(--skew)); }
+            66% { transform: translate(-5px, 5px) rotate(-1deg) skew(var(--skew)); }
+            100% { transform: translate(0, 0) rotate(0deg) skew(var(--skew)); }
+        }
+
+        .bubble {
+            animation: float 10s infinite ease-in-out;
+            animation-delay: calc(var(--left) * -0.1s);
+        }
+
+        @media (min-width: 640px) {
+            .sm\:shadow-lg {
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                            0 4px 6px -2px rgba(0, 0, 0, 0.05),
+                            0 0 0 1px rgba(0, 0, 0, 0.05);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen flex items-stretch bg-white sm:bg-gray-50 relative">
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] hidden sm:block"></div>
+
+        <!-- Interactive bubbles section -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
+            <!-- Left side bubbles -->
+            <div class="bubble" style="--size: 180px; --left: 15%; --top: 15%; --skew: -15deg;"></div>
+            <div class="bubble rounded-lg" style="--size: 140px; --left: 5%; --top: 45%; --skew: 20deg;"></div>
+            <div class="bubble" style="--size: 120px; --left: 20%; --top: 75%; --skew: -10deg;"></div>
+            
+            <!-- Right side bubbles -->
+            <div class="bubble rounded-lg" style="--size: 160px; --left: 75%; --top: 20%; --skew: 15deg;"></div>
+            <div class="bubble" style="--size: 130px; --left: 85%; --top: 50%; --skew: -20deg;"></div>
+            <div class="bubble rounded-lg" style="--size: 150px; --left: 80%; --top: 80%; --skew: 10deg;"></div>
+        </div>
+
+        <!-- Form container -->
+        <div class="w-full sm:max-w-[480px] sm:mx-auto sm:my-auto relative z-10">
+            <div class="bg-white w-full min-h-screen sm:min-h-0 flex flex-col justify-center sm:bg-white/80 sm:backdrop-blur-sm sm:h-auto px-6 py-8 sm:px-12 sm:py-10 sm:shadow-lg sm:border-2 sm:border-gray-200/50 sm:rounded-2xl hover:border-gray-300/50 transition-all duration-300">
+                <div class="w-full max-w-[400px] mx-auto">
+                    <!-- Form Header -->
+                    <div class="w-full">
+                        <h2 class="text-3xl sm:text-2xl font-semibold text-center text-gray-900">
+                            Create an account
+                        </h2>
+                        <p class="mt-2 text-lg sm:text-base text-center text-gray-600">
+                            Please fill in your details to register
+                        </p>
+                    </div>
+
+                    <!-- Form inputs -->
+                    <div class="mt-12 sm:mt-8">
+                        <form class="space-y-6 sm:space-y-4">
+                            <!-- Name Input -->
+                            <div>
+                                <label class="block text-base sm:text-sm font-medium text-gray-700">
+                                    Name
+                                </label>
+                                <div class="mt-2 grid grid-cols-2 gap-4">
+                                    <div>
+                                        <input 
+                                            id="firstName"
+                                            type="text" 
+                                            required 
+                                            class="block w-full px-4 py-4 sm:py-3.5 text-base border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                                            placeholder="First name"
+                                        >
+                                    </div>
+                                    <div>
+                                        <input 
+                                            id="lastName"
+                                            type="text" 
+                                            required 
+                                            class="block w-full px-4 py-4 sm:py-3.5 text-base border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                                            placeholder="Last name"
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Email Input -->
+                            <div>
+                                <label for="email" class="block text-base sm:text-sm font-medium text-gray-700">
+                                    Email
+                                </label>
+                                <div class="mt-2">
+                                    <input 
+                                        id="email"
+                                        type="email" 
+                                        required 
+                                        class="block w-full px-4 py-4 sm:py-3.5 text-base border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                                        placeholder="Enter your email"
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Password Input -->
+                            <div>
+                                <label for="password" class="block text-base sm:text-sm font-medium text-gray-700">
+                                    Password
+                                </label>
+                                <div class="mt-2">
+                                    <input 
+                                        id="password"
+                                        type="password" 
+                                        required 
+                                        class="block w-full px-4 py-4 sm:py-3.5 text-base border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                                        placeholder="Create a password"
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Confirm Password Input -->
+                            <div>
+                                <label for="confirm-password" class="block text-base sm:text-sm font-medium text-gray-700">
+                                    Confirm Password
+                                </label>
+                                <div class="mt-2">
+                                    <input 
+                                        id="confirm-password"
+                                        type="password" 
+                                        required 
+                                        class="block w-full px-4 py-4 sm:py-3.5 text-base border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                                        placeholder="Confirm your password"
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Register Button -->
+                            <div>
+                                <button 
+                                    type="submit" 
+                                    class="w-full px-4 py-4 sm:py-3.5 bg-black text-white text-base font-medium hover:bg-gray-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 rounded-xl"
+                                >
+                                    Create Account
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Divider -->
+                        <div class="relative my-8">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="w-full border-t border-gray-300"></div>
+                            </div>
+                            <div class="relative flex justify-center text-sm">
+                                <span class="px-4 bg-white text-gray-500">or continue with</span>
+                            </div>
+                        </div>
+
+                        <!-- LinkedIn Button -->
+                        <button 
+                            class="w-full px-4 py-3.5 border border-gray-300 text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center space-x-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 rounded-xl"
+                        >
+                            <svg class="w-5 h-5 text-[#0A66C2]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                            </svg>
+                            <span>Continue with LinkedIn</span>
+                        </button>
+
+                        <!-- Sign In Link -->
+                        <p class="mt-8 text-center text-sm text-gray-600">
+                            Already have an account?
+                            <a href="login.html" class="ml-1 font-medium text-black hover:underline">
+                                Sign in
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const bubbles = document.querySelectorAll('.bubble');
+            
+            bubbles.forEach(bubble => {
+                bubble.addEventListener('mouseover', () => {
+                    bubble.style.transform = 'scale(1.1)';
+                });
+                
+                bubble.addEventListener('mouseout', () => {
+                    bubble.style.transform = 'scale(1)';
+                });
+                
+                bubble.addEventListener('click', () => {
+                    bubble.style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        bubble.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
