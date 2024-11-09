@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles/globals.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <style>
         .bubble {
@@ -55,6 +56,7 @@
 </head>
 <body>
     <div class="min-h-screen flex items-stretch bg-white sm:bg-gray-50 relative">
+        <!-- Background Grid -->
         <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] hidden sm:block"></div>
 
         <!-- Interactive bubbles -->
@@ -102,7 +104,7 @@
             </div>
         </div>
 
-        <!-- User Form -->
+
 <!-- User Form -->
 <div id="user-form" class="w-full max-w-2xl sm:mx-auto sm:my-auto relative z-10 hidden">
     <!-- Progress Indicator -->
@@ -627,15 +629,12 @@
                 }
             });
 
-            // Special validation for step 6 (Terms checkbox)
+            // Special validation for step 6 (Benefits checkboxes)
             if (currentStep === 6) {
-                const termsCheckbox = document.getElementById('terms');
-                if (!termsCheckbox.checked) {
+                const checkedBenefits = currentStepElement.querySelectorAll('input[type="checkbox"]:checked').length;
+                if (checkedBenefits === 0) {
                     isValid = false;
-                    termsCheckbox.parentElement.classList.add('text-red-500');
-                    termsCheckbox.addEventListener('change', function() {
-                        this.parentElement.classList.remove('text-red-500');
-                    }, { once: true });
+                    alert('Please select at least one benefit');
                 }
             }
 
@@ -696,9 +695,35 @@
                 }
             } else {
                 if (validateCurrentStep()) {
-                    // Handle form submission
-                    console.log('Form submitted');
-                    document.getElementById('company-registration-form').submit();
+                    const formData = new FormData(document.getElementById('company-registration-form'));
+                    
+                    // Debug: Log form data
+                    for (let pair of formData.entries()) {
+                        console.log(pair[0] + ': ' + pair[1]);
+                    }
+                    
+                    fetch('includes/register_company.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            window.location.href = '/login.html';
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred during company registration');
+                    });
                 }
             }
         });
@@ -812,16 +837,24 @@
           // Handle form submission
           function handleUserFormSubmission() {
             const formData = new FormData(userForm);
-            const userData = Object.fromEntries(formData);
             
-            // Log the data for now (replace with actual API call later)
-            console.log('User Registration Data:', userData);
-            
-            // Show success message
-            alert('Registration successful!');
-            
-            // You can redirect here if needed
-            // window.location.href = '/dashboard';
+            fetch('includes/register_user.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.href = '/login.html'; // Redirect to login
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during registration');
+            });
           }
 
           // Initialize form
@@ -850,6 +883,30 @@
             });
           }
         });
+
+        // Company Registration Form Handling
+        function handleCompanyFormSubmission() {
+            const companyForm = document.getElementById('company-registration-form');
+            const formData = new FormData(companyForm);
+            
+            fetch('includes/register_company.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.href = '/login.html';
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during company registration');
+            });
+        }
     </script>
 </body>
 </html>
