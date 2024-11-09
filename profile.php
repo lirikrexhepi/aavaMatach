@@ -1,3 +1,18 @@
+<?php
+session_start();
+require_once 'config/db.php';
+
+// Fetch user's profile picture
+$stmt = $pdo->prepare("SELECT profile_picture FROM user_data WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$userData = $stmt->fetch();
+
+// Remove the leading slash if it exists
+$profilePicture = $userData['profile_picture'] 
+    ? ltrim($userData['profile_picture'], '\\') // Remove leading slash
+    : 'assets\\default-profile.jpg';  // Also removed leading slash from default path
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -32,16 +47,20 @@
         background-color: #e0e0e0;
         height: 200px;
         position: relative;
+        display: flex;
+        align-items: flex-end;
       }
 
       .profile-picture {
-        width: 100px;
-        height: 100px;
+        width: 150px !important;
+        height: 150px !important;
+        max-width: none !important;
         border-radius: 50%;
         border: 3px solid white;
         position: absolute;
         bottom: -50px;
         left: 20px;
+        object-fit: cover;
       }
 
       .profile-container {
@@ -68,7 +87,7 @@
         margin: 5px 0;
       }
 
-      .profile-location {
+      .profile-info {
         font-size: 14px;
         color: #333;
         margin-bottom: 20px;
@@ -333,11 +352,16 @@
 
     <div class="profile-container">
       <div class="profile-header">
-        <img src="profile-picture.jpg" alt="" class="profile-picture" />
+        <div class="relative cursor-pointer" id="profile-pic-container">
+            <img src="<?php echo htmlspecialchars($profilePicture); ?>" 
+                 alt="Profile Picture" 
+                 class="profile-picture" 
+                 id="profile-picture" />
+        </div>
       </div>
-      <h1 class="profile-name">Your Name</h1>
-      <p class="profile-headline">Full Stack Developer</p>
-      <p class="profile-location">Location · Contact info</p>
+      <h1 class="profile-name" id="profile-name"></h1>
+      <p class="profile-headline" id="profile-headline"></p>
+      <p class="profile-info" id="profile-info"></p>
       <div class="profile-buttons">
         <button class="button">Open to</button>
         <button class="button-outline">Add profile section</button>
@@ -346,10 +370,21 @@
           Edit Profile
         </button>
       </div>
-      <div class="profile-summary">
-        <p>
-          Open to work: Web Developer, Frontend Developer, Backend Developer...
-        </p>
+      <div class="profile-summary mt-4 text-sm">
+        <div class="grid grid-cols-2 gap-x-6 gap-y-1">
+            <div>Environment: <span class="text-gray-600" id="environment">Hybrid</span></div>
+            <div>Hours: <span class="text-gray-600" id="workhours">Fixed</span></div>
+            <div>Company: <span class="text-gray-600" id="company-size">Medium</span></div>
+            <div>Pace: <span class="text-gray-600" id="work-pace">Fast</span></div>
+            <div>Style: <span class="text-gray-600" id="communication-style">Formal</span></div>
+            <div>Team: <span class="text-gray-600" id="team-dynamic">Collaborative</span></div>
+            <div>Balance: <span class="text-gray-600" id="work-life">Strict</span></div>
+            <div>Support: <span class="text-gray-600" id="mental-support">Essential</span></div>
+        </div>
+        <div class="mt-2">
+            <div>Benefits: <span class="text-gray-600" id="benefits">Mental Health, Professional Dev, Remote Work</span></div>
+            <div>Goals: <span class="text-gray-600" id="goals">Work Life</span></div>
+        </div>
       </div>
     </div>
 
@@ -377,13 +412,13 @@
             value="Full Stack Developer"
           />
 
-          <label for="location">Location:</label>
+          <label for="info">Info:</label>
           <input
             type="text"
-            id="location"
-            name="location"
+            id="info"
+            name="info"
             class="w-full mb-4 p-2 border rounded"
-            value="Location · Contact info"
+            value="Industry | Experience"
           />
 
           <button type="submit" class="button">Save Changes</button>
@@ -456,11 +491,79 @@
       </a>
     </div>
 
+    <!-- Hidden file input -->
+    <input type="file" id="profile-pic-input" accept="image/*" class="hidden" />
+
     <script>
       const editProfileBtn = document.getElementById("edit-profile-btn");
       const editProfileModal = document.getElementById("edit-profile-modal");
       const closeModalBtn = document.getElementById("close-modal-btn");
 
+      // Fetch and display profile data
+      async function loadProfileData() {
+        try {
+          const response = await fetch('includes/get_profile_data.php');
+          const data = await response.json();
+          
+          if (data.success) {
+            const userData = data.data;
+            
+            // Basic profile info
+            document.getElementById('profile-name').textContent = userData.fullname;
+            document.getElementById('profile-headline').textContent = userData.role || 'No headline set';
+            
+            // Industry and Experience
+            const industry = userData.industry 
+                ? userData.industry.charAt(0).toUpperCase() + userData.industry.slice(1) 
+                : 'Industry not set';
+            let experience = 'Experience not set';
+            if (userData.experience) {
+                experience = userData.experience.charAt(0).toUpperCase() + userData.experience.slice(1);
+                if (/\d/.test(experience)) {
+                    experience += ' years';
+                }
+            }
+            document.getElementById('profile-info').textContent = `${industry} | ${experience}`;
+
+            // Work Preferences
+            document.getElementById('environment').textContent = `Environment: ${capitalize(userData.environment || 'Not specified')}`;
+            document.getElementById('workhours').textContent = `Working Hours: ${capitalize(userData.workhours || 'Not specified')}`;
+            document.getElementById('company-size').textContent = `Preferred Company Size: ${capitalize(userData.prefered_company_size || 'Not specified')}`;
+            document.getElementById('work-pace').textContent = `Work Pace: ${capitalize(userData.work_pace || 'Not specified')}`;
+
+            // Communication & Team
+            document.getElementById('communication-style').textContent = `Communication Style: ${capitalize(userData.communication || 'Not specified')}`;
+            document.getElementById('team-dynamic').textContent = `Team Dynamic: ${capitalize(userData.team_dynamic || 'Not specified')}`;
+            document.getElementById('work-life').textContent = `Work-Life Balance: ${capitalize(userData.work_life_balance || 'Not specified')}`;
+
+            // Wellness & Benefits
+            document.getElementById('mental-support').textContent = `Mental Health Support: ${capitalize(userData.mental_support || 'Not specified')}`;
+            document.getElementById('wellness-program').textContent = `Wellness Program: ${capitalize(userData.wellness_program || 'Not specified')}`;
+            
+            // Format benefits as a list if they exist
+            const benefits = userData.benefits ? userData.benefits.split(',').map(b => capitalize(b.replace(/_/g, ' '))).join(', ') : 'Not specified';
+            document.getElementById('benefits').textContent = `Benefits: ${benefits}`;
+
+            // Goals
+            document.getElementById('goals').textContent = `Primary Goals: ${capitalize(userData.goals?.replace(/_/g, ' ') || 'Not specified')}`;
+
+            // Profile picture
+            const profilePicture = document.getElementById('profile-picture');
+            if (userData.profile_picture) {
+                profilePicture.src = userData.profile_picture;
+            } else {
+                profilePicture.src = '/assets/default-profile.jpg';
+            }
+          }
+        } catch (error) {
+          console.error('Error loading profile data:', error);
+        }
+      }
+
+      // Load profile data when page loads
+      document.addEventListener('DOMContentLoaded', loadProfileData);
+
+      // Modal event listeners
       editProfileBtn.addEventListener("click", () => {
         editProfileModal.style.display = "flex";
       });
@@ -472,6 +575,110 @@
       window.addEventListener("click", (event) => {
         if (event.target === editProfileModal) {
           editProfileModal.style.display = "none";
+        }
+      });
+
+      // Handle form submission
+      document.querySelector('.modal-content form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        
+        try {
+          const response = await fetch('includes/update_profile.php', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            editProfileModal.style.display = "none";
+            loadProfileData(); // Reload profile data
+          } else {
+            alert(data.message || 'Error updating profile');
+          }
+        } catch (error) {
+          console.error('Error updating profile:', error);
+          alert('Error updating profile');
+        }
+      });
+
+      // Helper function to capitalize strings
+      function capitalize(str) {
+        return str.split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const profilePicContainer = document.getElementById('profile-pic-container');
+        const profilePicInput = document.getElementById('profile-pic-input');
+        const profilePicture = document.getElementById('profile-picture');
+
+        // Handle click on profile picture
+        profilePicContainer.addEventListener('click', () => {
+            profilePicInput.click();
+        });
+
+        // Handle file selection
+        profilePicInput.addEventListener('change', async (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
+                
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select an image file');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('profile_picture', file);
+
+                try {
+                    const response = await fetch('includes/upload_profile_picture.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Update profile picture with the returned path
+                        profilePicture.src = data.path;
+                        alert('Profile picture updated successfully');
+                    } else {
+                        alert(data.message || 'Failed to upload profile picture');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error uploading profile picture');
+                }
+            }
+        });
+
+        // Update the loadProfileData function to handle profile picture
+        async function loadProfileData() {
+            try {
+                const response = await fetch('includes/get_profile_data.php');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const userData = data.data;
+                    
+                    // Update profile picture
+                    const profilePicture = document.getElementById('profile-picture');
+                    if (userData.profile_picture) {
+                        // Use the path directly from the database
+                        profilePicture.src = userData.profile_picture;
+                    } else {
+                        profilePicture.src = '/assets/default-profile.jpg';
+                    }
+
+                    // ... rest of your existing loadProfileData code ...
+                }
+            } catch (error) {
+                console.error('Error loading profile data:', error);
+            }
         }
       });
     </script>
