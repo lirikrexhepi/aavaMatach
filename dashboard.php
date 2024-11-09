@@ -24,16 +24,18 @@ if (!in_array($section, $allowed_sections)) {
     <div class="main-content">
         <?php include BASE_PATH . '/includes/header.php'; ?>
         
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <?php 
-            $section_file = BASE_PATH . "/sections/{$section}.php";
-            if (file_exists($section_file)) {
-                include $section_file;
-            } else {
-                echo "<div class='bg-white rounded-lg shadow-sm p-6'>Section not found</div>";
-            }
-            ?>
-        </main>
+        <div class="min-h-screen bg-gray-50 py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <?php 
+                $section_file = BASE_PATH . "/sections/{$section}.php";
+                if (file_exists($section_file)) {
+                    include $section_file;
+                } else {
+                    echo "<div class='bg-white rounded-lg shadow-sm p-6'>Section not found</div>";
+                }
+                ?>
+            </div>
+        </div>
     </div>
 </body>
 </html> 
