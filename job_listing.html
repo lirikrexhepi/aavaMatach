@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Listings - Aava Match</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=general-sans@500,600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background: radial-gradient(
+            circle at 10% 20%,
+            rgba(0, 0, 0, 0.02) 0%,
+            transparent 8%
+          ),
+          radial-gradient(
+            circle at 90% 80%,
+            rgba(0, 0, 0, 0.02) 0%,
+            transparent 8%
+          );
+        background-color: #ffffff;
+      }
+
+      nav {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .logo {
+        font-family: "General Sans", sans-serif;
+        font-weight: 600;
+        font-size: 1.5rem;
+        letter-spacing: -0.02em;
+      }
+
+      .job-card {
+        transition: all 0.2s ease-in-out;
+      }
+
+      .job-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="top-nav">
+      <div
+        class="nav-container max-w-6xl mx-auto px-6 py-4 flex justify-between items-center"
+      >
+        <div class="nav-spacer"></div>
+        <a href="#" class="logo text-black">aava match.</a>
+        <button
+          class="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+        >
+          Create Listing
+        </button>
+      </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 py-8">
+      <!-- Header Section -->
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h1 class="text-2xl font-semibold mb-2">Job Listings</h1>
+          <p class="text-gray-600">Manage and track your job postings</p>
+        </div>
+        <div class="flex gap-4">
+          <button
+            class="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Filter
+          </button>
+          <div class="relative">
+            <input
+              type="text"
+              placeholder="Search listings..."
+              class="pl-10 pr-4 py-2 border rounded-lg w-64 focus:outline-none focus:border-black"
+            />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Job Listings Grid -->
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        id="job-listings"
+      >
+        <!-- Job cards will be inserted here via JavaScript -->
+      </div>
+    </main>
+
+    <script>
+      // Sample job listings data
+      const jobListings = [
+        {
+          title: "Senior Software Engineer",
+          company: "TechCorp Solutions",
+          location: "San Francisco, CA",
+          type: "Full-time",
+          status: "Published",
+          date: "2024-01-15",
+          applicants: 24,
+        },
+        {
+          title: "Product Designer",
+          company: "Creative Minds Agency",
+          location: "New York, NY",
+          type: "Full-time",
+          status: "Draft",
+          date: "2024-01-14",
+          applicants: 12,
+        },
+        // Add more job listings as needed
+      ];
+
+      function createJobCard(job) {
+        return `
+          <div class="job-card bg-white p-6 rounded-xl border shadow-sm">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="font-semibold text-lg mb-1">${job.title}</h3>
+                <p class="text-gray-600 text-sm">${job.company}</p>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-medium ${
+                job.status === "Published"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-gray-100 text-gray-800"
+              }">${job.status}</span>
+            </div>
+            <div class="space-y-3">
+              <div class="flex items-center text-sm text-gray-500">
+                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                ${job.location}
+              </div>
+              <div class="flex items-center text-sm text-gray-500">
+                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                ${job.type}
+              </div>
+              <div class="flex items-center text-sm text-gray-500">
+                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                ${job.applicants} applicants
+              </div>
+            </div>
+            <div class="mt-4 pt-4 border-t flex justify-end">
+              <button class="text-sm text-gray-600 hover:text-black">Edit</button>
+            </div>
+          </div>
+        `;
+      }
+
+      // Initialize job listings
+      function initializeJobListings() {
+        const container = document.getElementById("job-listings");
+        container.innerHTML = jobListings
+          .map((job) => createJobCard(job))
+          .join("");
+      }
+
+      // Initialize when page loads
+      initializeJobListings();
+    </script>
+  </body>
+</html>

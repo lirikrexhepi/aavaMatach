@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aava Match</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=general-sans@500,600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      nav {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-family: "General Sans", sans-serif;
+        font-weight: 600;
+        font-size: 1.5rem;
+        letter-spacing: -0.02em;
+        color: #000;
+        text-decoration: none;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .nav-link {
+        font-family: "General Sans", sans-serif;
+        font-weight: 500;
+        font-size: 0.95rem;
+        color: #666;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        padding: 0.5rem 0;
+        position: relative;
+      }
+
+      .nav-link:hover {
+        color: #000;
+      }
+
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: #000;
+        transform: scaleX(0);
+        transition: transform 0.2s ease;
+      }
+
+      .nav-link:hover::after {
+        transform: scaleX(1);
+      }
+
+      /* Add space for centered logo */
+      .nav-spacer {
+        width: 100px; /* Adjust based on your needs */
+      }
+
+      /* Keep existing top nav styles */
+      .top-nav {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        height: 70px;
+        display: flex;
+        align-items: center;
+      }
+
+      /* Add bottom navigation styles */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        display: flex;
+        justify-content: space-around;
+        padding: 12px 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+      }
+
+      .bottom-nav-link {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: #666;
+        font-family: "General Sans", sans-serif;
+        font-size: 12px;
+        gap: 4px;
+        transition: color 0.2s ease;
+      }
+
+      .bottom-nav-link:hover {
+        color: #000;
+      }
+
+      .nav-icon {
+        width: 24px;
+        height: 24px;
+      }
+
+      /* Add padding to main content to account for bottom nav */
+      main {
+        padding-bottom: 70px;
+      }
+
+      /* Adjust AI bot position to not conflict with bottom nav */
+      .ai-bot-container {
+        bottom: 80px;
+      }
+
+      /* Make it responsive */
+      @media (max-width: 768px) {
+        .bottom-nav {
+          padding: 10px 0;
+        }
+
+        .nav-icon {
+          width: 22px;
+          height: 22px;
+        }
+      }
+
+      .swipe-instructions {
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 20px 0;
+        font-family: "General Sans", sans-serif;
+      }
+
+      .swipe-instructions p {
+        margin: 5px 0;
+      }
+
+      /* Make instructions responsive */
+      @media (max-width: 768px) {
+        .swipe-instructions {
+          font-size: 13px;
+          margin: 15px 0;
+        }
+      }
+
+      .card {
+        min-height: 180px;
+        max-height: 180px;
+        transform: none;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        cursor: pointer;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+      }
+
+      #fullscreen-card .card {
+        min-height: auto;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      #fullscreen-card {
+        transition: opacity 0.3s ease;
+      }
+
+      #fullscreen-card.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* Scrollbar styling */
+      .card::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .card::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+      }
+
+      .card::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 3px;
+      }
+
+      .card::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+
+      .swipe-indicator {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 82px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease, color 0.2s ease;
+        z-index: 1000;
+      }
+
+      .swipe-indicator.visible {
+        opacity: 1;
+      }
+
+      .swipe-right {
+        color: #ef4444;
+      }
+      .swipe-left {
+        color: #22c55e;
+      }
+      .swipe-up {
+        color: #3b82f6;
+      }
+      .swipe-down {
+        color: #f59e0b;
+      }
+
+      /* Add these new styles */
+      .swipeable-card {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        touch-action: none; /* Prevents default touch behaviors */
+        transform-origin: center center; /* Ensures rotation happens from center */
+        will-change: transform; /* Optimizes performance for animations */
+      }
+
+      .swipe-indicator {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 82px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease, color 0.2s ease;
+        z-index: 1000;
+      }
+
+      .swipe-indicator.visible {
+        opacity: 1;
+      }
+
+      .swipe-right {
+        color: #ef4444;
+      }
+      .swipe-left {
+        color: #22c55e;
+      }
+      .swipe-up {
+        color: #3b82f6;
+      }
+      .swipe-down {
+        color: #f59e0b;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="top-nav">
+      <div class="nav-container">
+        <div class="nav-spacer"></div>
+        <a href="#" class="logo">aava match.</a>
+        <div class="nav-spacer"></div>
+      </div>
+    </nav>
+
+    <div class="bottom-nav">
+      <a href="./dashboard.html" class="bottom-nav-link">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="nav-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M21 3H3C2 3 1 4 1 5V19C1 20 2 21 3 21H21C22 21 23 20 23 19V5C23 4 22 3 21 3ZM12 18L3 11V5H21V11L12 18Z"
+          />
+        </svg>
+        Matches
+      </a>
+      <a href="./review.html" class="bottom-nav-link">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="nav-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+          />
+        </svg>
+        Review
+      </a>
+      <a href="#" class="bottom-nav-link">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="nav-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
+          />
+          <path
+            d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
+          />
+        </svg>
+        Profile
+      </a>
+    </div>
+
+    <!-- Background Elements -->
+    <div class="background-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <main class="max-w-6xl mx-auto px-6 py-12">
+      <!-- Grid container -->
+      <div
+        id="grid-cards-container"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        <!-- Cards will be inserted here -->
+      </div>
+
+      <!-- Fullscreen card view (initially hidden) -->
+      <div id="fullscreen-card" class="fixed inset-0 bg-white/95 z-50 hidden">
+        <div class="relative h-screen w-full flex items-center justify-center">
+          <div
+            id="fullscreen-cards-container"
+            class="relative w-full h-full flex items-center justify-center"
+          >
+            <!-- Selected card will be shown here -->
+          </div>
+          <button
+            id="close-fullscreen"
+            class="absolute top-6 right-6 text-gray-500 hover:text-black"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </main>
+    <div class="text-center bottom-10 mt-8 text-gray-500">
+      <div class="swipe-instructions">
+        <p>Anything seem familiar?</p>
+        <p>
+          By reviewing the credibility and claims of places u previously worked
+          you help pushing <br />
+          transparency and u also win extra swipes😉
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Dummy data for previous jobs
+      const previousJobs = [
+        {
+          name: "Google",
+          role: "Senior Software Engineer",
+          duration: "2018 - 2021",
+          type: "Full-time",
+          location: "Mountain View, CA",
+          description:
+            "Led development of Google Cloud Platform features and infrastructure improvements.",
+          achievements:
+            "Improved system performance by 40%, led a team of 5 engineers",
+          skills: ["Cloud Computing", "Golang", "Kubernetes", "System Design"],
+          verified: true,
+        },
+        {
+          name: "Microsoft",
+          role: "Software Developer",
+          duration: "2015 - 2018",
+          type: "Full-time",
+          location: "Redmond, WA",
+          description: "Worked on Azure cloud services and developer tools.",
+          achievements:
+            "Developed key features for Azure DevOps, reduced deployment time by 60%",
+          skills: ["Azure", "C#", ".NET", "DevOps"],
+          verified: true,
+        },
+        {
+          name: "Netflix",
+          role: "Frontend Engineer",
+          duration: "2013 - 2015",
+          type: "Contract",
+          location: "Los Gatos, CA",
+          description: "Developed and optimized Netflix's streaming interface.",
+          achievements:
+            "Implemented new UI features, improved loading times by 25%",
+          skills: ["React", "JavaScript", "Performance Optimization"],
+          verified: true,
+        },
+        {
+          name: "Amazon",
+          role: "Systems Engineer",
+          duration: "2011 - 2013",
+          type: "Full-time",
+          location: "Seattle, WA",
+          description: "Maintained and improved AWS infrastructure systems.",
+          achievements:
+            "Implemented automated scaling solutions, reduced costs by 30%",
+          skills: ["AWS", "Python", "Infrastructure"],
+          verified: false,
+        },
+        {
+          name: "Apple",
+          role: "iOS Developer",
+          duration: "2009 - 2011",
+          type: "Full-time",
+          location: "Cupertino, CA",
+          description: "Developed features for iOS core applications.",
+          achievements:
+            "Contributed to iOS 5 release, implemented iCloud sync features",
+          skills: ["iOS", "Swift", "Objective-C"],
+          verified: true,
+        },
+        {
+          name: "Meta",
+          role: "Product Engineer",
+          duration: "2007 - 2009",
+          type: "Full-time",
+          location: "Menlo Park, CA",
+          description:
+            "Worked on Facebook's news feed algorithms and features.",
+          achievements:
+            "Improved engagement metrics by 15%, reduced spam by 40%",
+          skills: ["PHP", "Python", "Machine Learning"],
+          verified: true,
+        },
+      ];
+
+      // Create compact card HTML for grid view
+      function createCompactCard(job) {
+        return `
+          <div class="card w-full bg-white border rounded-xl p-4 shadow-lg">
+            <div class="mb-3">
+              <div class="flex justify-between items-start">
+                <h2 class="text-xl font-semibold">${job.name}</h2>
+                ${
+                  job.verified
+                    ? `<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Verified</span>`
+                    : `<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Pending</span>`
+                }
+              </div>
+              <p class="text-gray-500 text-sm">${job.role}</p>
+              <p class="text-gray-400 text-xs">${job.duration}</p>
+            </div>
+
+            <div class="space-y-2">
+              <div class="flex flex-wrap gap-1">
+                ${job.skills
+                  .slice(0, 3)
+                  .map(
+                    (skill) =>
+                      `<span class="px-2 py-0.5 bg-gray-100 rounded-full text-xs">${skill}</span>`
+                  )
+                  .join("")}
+                ${
+                  job.skills.length > 3
+                    ? `<span class="px-2 py-0.5 bg-gray-100 rounded-full text-xs">+${
+                        job.skills.length - 3
+                      } more</span>`
+                    : ""
+                }
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Create detailed card HTML for fullscreen view
+      function createDetailedCard(job) {
+        return `
+          <div class="card w-full max-w-2xl bg-white border rounded-xl p-6 shadow-lg">
+            <div class="mb-4">
+              <div class="flex justify-between items-start">
+                <h2 class="text-2xl font-semibold mb-1">${job.name}</h2>
+                ${
+                  job.verified
+                    ? `<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Verified</span>`
+                    : `<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Pending</span>`
+                }
+              </div>
+              <p class="text-gray-500">${job.role}</p>
+              <p class="text-gray-400 text-sm">${job.duration} · ${
+          job.location
+        }</p>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <h3 class="font-medium mb-2">Description</h3>
+                <p class="text-gray-600">${job.description}</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium mb-2">Key Achievements</h3>
+                <p class="text-gray-600">${job.achievements}</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium mb-2">Skills</h3>
+                <div class="flex flex-wrap gap-2">
+                  ${job.skills
+                    .map(
+                      (skill) =>
+                        `<span class="px-3 py-1 bg-gray-100 rounded-full text-sm">${skill}</span>`
+                    )
+                    .join("")}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Initialize grid cards
+      function initializeGridCards() {
+        const container = document.getElementById("grid-cards-container");
+        container.innerHTML = "";
+
+        previousJobs.forEach((job, index) => {
+          const cardWrapper = document.createElement("div");
+          cardWrapper.className = "relative card-wrapper";
+          cardWrapper.innerHTML = createCompactCard(job);
+
+          const card = cardWrapper.querySelector(".card");
+          card.addEventListener("click", (e) => {
+            const rect = card.getBoundingClientRect();
+            showFullscreenCard(index, rect);
+          });
+
+          container.appendChild(cardWrapper);
+        });
+      }
+
+      // Show fullscreen card view with animation
+      function showFullscreenCard(index, startRect) {
+        const fullscreenView = document.getElementById("fullscreen-card");
+        const container = document.getElementById("fullscreen-cards-container");
+
+        fullscreenView.classList.remove("hidden");
+        container.innerHTML = createDetailedCard(previousJobs[index]);
+
+        const card = container.querySelector(".card");
+        card.classList.add("swipeable-card");
+
+        // Apply starting position
+        card.style.position = "fixed";
+        card.style.top = `${startRect.top}px`;
+        card.style.left = `${startRect.left}px`;
+        card.style.width = `${startRect.width}px`;
+        card.style.height = `${startRect.height}px`;
+
+        // Force a reflow
+        card.offsetHeight;
+
+        // Animate to center with smoother easing
+        requestAnimationFrame(() => {
+          card.style.transition = "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+          card.style.top = "50%";
+          card.style.left = "50%";
+          card.style.transform = "translate(-50%, -50%)";
+          card.style.width = "calc(100% - 2rem)";
+          card.style.maxWidth = "42rem";
+          card.style.height = "auto";
+          card.style.maxHeight = "80vh";
+
+          // Add swipe functionality after animation
+          setTimeout(() => {
+            makeSwipeable(card);
+            // Add swipe indicators
+            if (!document.querySelector(".swipe-indicator")) {
+              const indicator = document.createElement("div");
+              indicator.className = "swipe-indicator";
+              document.body.appendChild(indicator);
+            }
+          }, 400);
+        });
+
+        document.body.style.overflow = "hidden";
+      }
+
+      // Close fullscreen view
+      document
+        .getElementById("close-fullscreen")
+        .addEventListener("click", () => {
+          const fullscreenView = document.getElementById("fullscreen-card");
+          const card = fullscreenView.querySelector(".card");
+
+          card.style.transition = "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+          card.style.opacity = "0";
+          card.style.transform = "translate(-50%, -50%) scale(0.95)";
+
+          setTimeout(() => {
+            fullscreenView.classList.add("hidden");
+            document.body.style.overflow = "auto";
+          }, 400);
+        });
+
+      // Initialize when page loads
+      initializeGridCards();
+
+      // Add this new function for swipe functionality
+      function makeSwipeable(card) {
+        let startX, startY, moveX, moveY;
+        let isDragging = false;
+        let currentDirection = null;
+
+        function showIndicator(direction) {
+          const indicator = document.querySelector(".swipe-indicator");
+
+          // If direction changed, fade out first
+          if (currentDirection && currentDirection !== direction) {
+            indicator.style.opacity = "0";
+
+            setTimeout(() => {
+              updateIndicator(indicator, direction);
+            }, 200); // Match the transition duration
+          } else {
+            updateIndicator(indicator, direction);
+          }
+
+          currentDirection = direction;
+        }
+
+        function updateIndicator(indicator, direction) {
+          // Update text and classes
+          indicator.textContent =
+            direction === "right"
+              ? "✕"
+              : direction === "left"
+              ? "✓"
+              : direction === "up"
+              ? "!"
+              : "?";
+
+          // Remove all direction classes
+          indicator.classList.remove(
+            "swipe-right",
+            "swipe-left",
+            "swipe-up",
+            "swipe-down"
+          );
+
+          // Add new direction class
+          indicator.classList.add(`swipe-${direction}`);
+
+          // Show the indicator
+          indicator.classList.add("visible");
+          indicator.style.opacity = "1";
+        }
+
+        function hideIndicator() {
+          const indicator = document.querySelector(".swipe-indicator");
+          indicator.classList.remove("visible");
+          currentDirection = null;
+        }
+
+        function handleStart(e) {
+          startX = e.type === "mousedown" ? e.clientX : e.touches[0].clientX;
+          startY = e.type === "mousedown" ? e.clientY : e.touches[0].clientY;
+          isDragging = true;
+          card.style.transition = "none";
+        }
+
+        function handleMove(e) {
+          if (!isDragging) return;
+
+          moveX =
+            (e.type === "mousemove" ? e.clientX : e.touches[0].clientX) -
+            startX;
+          moveY =
+            (e.type === "mousemove" ? e.clientY : e.touches[0].clientY) -
+            startY;
+
+          // Calculate rotation based on horizontal movement
+          const rotate = moveX * 0.1;
+
+          card.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px)) rotate(${rotate}deg)`;
+
+          // Determine swipe direction based on the strongest movement
+          const threshold = 50;
+          const absX = Math.abs(moveX);
+          const absY = Math.abs(moveY);
+
+          if (absX > threshold || absY > threshold) {
+            if (absX > absY) {
+              showIndicator(moveX > 0 ? "right" : "left");
+            } else {
+              showIndicator(moveY > 0 ? "down" : "up");
+            }
+          } else {
+            hideIndicator();
+          }
+        }
+
+        function handleEnd() {
+          if (!isDragging) return;
+          isDragging = false;
+          hideIndicator();
+
+          const threshold = 100;
+          card.style.transition = "transform 0.3s ease, opacity 0.3s ease";
+
+          if (Math.abs(moveX) > threshold || Math.abs(moveY) > threshold) {
+            const direction =
+              Math.abs(moveX) > Math.abs(moveY)
+                ? moveX > 0
+                  ? "right"
+                  : "left"
+                : moveY > 0
+                ? "down"
+                : "up";
+
+            // Add rotation to the exit animation for left/right swipes
+            const rotate =
+              direction === "right" ? 45 : direction === "left" ? -45 : 0;
+            const endX =
+              direction === "right" ? 1500 : direction === "left" ? -1500 : 0;
+            const endY =
+              direction === "down" ? 1500 : direction === "up" ? -1500 : 0;
+
+            card.style.transform = `translate(calc(-50% + ${endX}px), calc(-50% + ${endY}px)) rotate(${rotate}deg)`;
+            card.style.opacity = "0";
+
+            setTimeout(() => {
+              document
+                .getElementById("fullscreen-card")
+                .classList.add("hidden");
+              document.body.style.overflow = "auto";
+            }, 300);
+          } else {
+            // Reset position and rotation
+            card.style.transform = "translate(-50%, -50%) rotate(0deg)";
+          }
+        }
+
+        // Add event listeners for both mouse and touch events
+        card.addEventListener("mousedown", handleStart);
+        card.addEventListener("touchstart", handleStart);
+        document.addEventListener("mousemove", handleMove);
+        document.addEventListener("touchmove", handleMove);
+        document.addEventListener("mouseup", handleEnd);
+        document.addEventListener("touchend", handleEnd);
+      }
+    </script>
+  </body>
+</html>
