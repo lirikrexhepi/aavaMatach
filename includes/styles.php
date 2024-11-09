@@ -15,11 +15,11 @@
         top: 0;
         left: 0;
         overflow-y: auto;
+        z-index: 40;
     }
 
     .main-content {
         margin-left: 280px;
-        padding: 2rem;
     }
 
     @media (max-width: 1024px) {
