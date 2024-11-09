@@ -61,7 +61,7 @@
     
                     <!-- Form inputs - Update input sizing -->
                     <div class="mt-12 sm:mt-8">
-                        <form class="space-y-6 sm:space-y-4">
+                        <form id="loginForm" class="space-y-6 sm:space-y-4" onsubmit="return false;">
                             <!-- Email Input -->
                             <div>
                                 <label for="email" class="block text-base sm:text-sm font-medium text-gray-700">
@@ -217,5 +217,48 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginForm = document.getElementById('loginForm');
+        const submitButton = loginForm.querySelector('button[type="submit"]');
+    
+        submitButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+    
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+    
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('password', password);
+    
+            try {
+                const response = await fetch('includes/login_logic.php', {
+                    method: 'POST',
+                    body: formData
+                });
+    
+                const data = await response.json();
+    
+                if (data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    alert(data.message || 'Login failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred during login. Please try again.');
+            }
+        });
+    });
+    </script>
+
 <script src="https://cdn.tailwindcss.com"></script> 
