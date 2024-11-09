@@ -281,7 +281,7 @@
             </svg>
           </button>
         </div>
-        <form class="space-y-6" id="createJobForm">
+        <form class="space-y-6" id="createJobForm" action="create_job_listings.php" method="POST">
           <!-- Location Field -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
@@ -416,48 +416,6 @@
 
       // Fetch job listings on page load
       document.addEventListener('DOMContentLoaded', fetchJobListings);
-
-      // Handle form submission
-      document.getElementById("createJobForm").addEventListener("submit", function(event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        // Get form data
-        const location = this.location.value;
-        const employment = this.employment.value;
-        const employmentType = this.employment_type.value;
-        const salary = this.salary.value;
-        const description = this.description.value;
-
-        // Create a FormData object to send data
-        const formData = new FormData();
-        formData.append('location', location);
-        formData.append('employment', employment);
-        formData.append('employment_type', employmentType);
-        formData.append('salary', salary);
-        formData.append('description', description);
-
-        // Send the data to the server using fetch
-        fetch('create_job_listings.php', {
-          method: 'POST',
-          body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            // Fetch and display updated job listings
-            fetchJobListings();
-
-            // Close the modal after handling the form data
-            hideAddJobModal();
-
-            // Optionally, clear the form fields
-            this.reset();
-          } else {
-            alert('Failed to create job listing. Please try again.');
-          }
-        })
-        .catch(error => console.error('Error:', error));
-      });
     </script>
   </body>
 </html>
