@@ -36,8 +36,7 @@
                     <!-- Dropdown Menu (Initially Hidden) -->
                     <div class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5" id="profile-dropdown">
                         <div class="py-1">
-                            <a href="company-profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Company Profile</a>
-                            <a href="settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                        <a href="?section=company_profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Company Profile</a>                            <a href="settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
                             <div class="border-t border-gray-100"></div>
                             <a href="logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sign out</a>
                         </div>

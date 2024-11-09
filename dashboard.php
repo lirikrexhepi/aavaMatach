@@ -3,7 +3,7 @@ session_start();
 define('BASE_PATH', __DIR__);
 
 $section = isset($_GET['section']) ? $_GET['section'] : 'dashboard';
-$allowed_sections = ['dashboard', 'analytics', 'job_listings', 'applications', 'settings'];
+$allowed_sections = ['dashboard', 'analytics', 'job_listings', 'applications', 'settings', 'company_profile'];
 if (!in_array($section, $allowed_sections)) {
     $section = 'dashboard';
 }
