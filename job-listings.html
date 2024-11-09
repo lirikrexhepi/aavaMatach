@@ -184,7 +184,7 @@
     <!-- Update the nav and main content wrapper -->
     <div class="main-content">
       <main class="px-6 py-8">
-        <!-- Header section with title and create button -->asdad
+        <!-- Header section with title and create button -->
         <div class="flex justify-between items-center mb-8">
           <h1 class="text-2xl font-semibold">Job Listings</h1>
           <button
@@ -205,7 +205,7 @@
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 absolute left-3 top-2.5 text-gray-400"
+              class="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -214,89 +214,46 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                d="M8 16l-4 4m0 0l4-4m-4 4h18M3 8l4-4m0 0l-4 4m4-4v18"
               />
             </svg>
           </div>
-          <select
-            class="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
+          <button
+            class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition-colors"
           >
-            <option value="">All locations</option>
-            <option value="remote">Remote</option>
-            <option value="onsite">On-site</option>
-            <option value="hybrid">Hybrid</option>
-          </select>
-          <select
-            class="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
-          >
-            <option value="">Job Type</option>
-            <option value="full-time">Full-time</option>
-            <option value="part-time">Part-time</option>
-            <option value="contract">Contract</option>
-          </select>
-          <select
-            class="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
-          >
-            <option value="">Sort by</option>
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-            <option value="title">Title A-Z</option>
-          </select>
+            Filter
+          </button>
         </div>
 
-        <!-- Job Listings with padding only on the cards -->
-        <div class="space-y-4 mx-auto" style="max-width: calc(100% - 48px)">
-          <!-- Job Card Template -->
-          <div
-            class="p-8 bg-white border border-gray-100 rounded-xl hover:border-gray-200 transition-colors"
-          >
+        <!-- Job listings container -->
+        <div id="jobListings" class="space-y-4 mx-auto" style="max-width: calc(100% - 48px)">
+          <!-- Hardcoded Job Card -->
+          <div class="p-8 bg-white border border-gray-100 rounded-xl hover:border-gray-200 transition-colors">
             <div class="flex justify-between items-start">
               <div>
-                <h3 class="text-lg font-semibold">Senior Software Engineer</h3>
-                <p class="text-gray-600 mt-1">
-                  TechCorp Solutions • San Francisco, CA
-                </p>
+                <h3 class="text-lg font-semibold">Software Engineer</h3>
+                <p class="text-gray-600 mt-1">San Francisco</p>
                 <div class="flex gap-2 mt-3">
-                  <span class="px-3 py-1 bg-gray-100 rounded-full text-sm"
-                    >Full-time</span
-                  >
-                  <span class="px-3 py-1 bg-gray-100 rounded-full text-sm"
-                    >Remote</span
-                  >
-                  <span class="px-3 py-1 bg-gray-100 rounded-full text-sm"
-                    >$120k-150k</span
-                  >
+                  <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">Full-time</span>
+                  <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">$120,000</span>
                 </div>
               </div>
               <div class="flex items-center gap-2">
-                <span class="text-green-600 text-sm font-medium"
-                  >Published</span
-                >
+                <span class="text-green-600 text-sm font-medium">Published</span>
                 <button class="text-gray-400 hover:text-gray-600">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                    />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                   </svg>
                 </button>
               </div>
             </div>
           </div>
-          <!-- More job cards would go here -->
+          <!-- Dynamic Job Cards will be inserted here -->
         </div>
       </main>
     </div>
 
-    <!-- Add Job Modal -->
+    <!-- Modal for creating a new job listing -->
     <div
       id="addJobModal"
       class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center"
@@ -324,30 +281,30 @@
             </svg>
           </button>
         </div>
-        <form class="space-y-6">
+        <form class="space-y-6" id="createJobForm">
+          <!-- Location Field -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Job Title</label
-            >
+            <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
             <input
               type="text"
+              name="location"
               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
             />
           </div>
+          <!-- Employment Field -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Location</label
-            >
+            <label class="block text-sm font-medium text-gray-700 mb-1">Employment</label>
             <input
               type="text"
+              name="employment"
               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
             />
           </div>
+          <!-- Employment Type Field -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Employment Type</label
-            >
+            <label class="block text-sm font-medium text-gray-700 mb-1">Employment Type</label>
             <select
+              name="employment_type"
               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
             >
               <option value="full-time">Full-time</option>
@@ -355,32 +312,26 @@
               <option value="contract">Contract</option>
             </select>
           </div>
+          <!-- Salary Field -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Salary Range</label
-            >
-            <div class="flex gap-4">
-              <input
-                type="text"
-                placeholder="Min"
-                class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
-              />
-              <input
-                type="text"
-                placeholder="Max"
-                class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
-              />
-            </div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Salary</label>
+            <input
+              type="text"
+              name="salary"
+              placeholder="Enter salary"
+              class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
+            />
           </div>
+          <!-- Description Field -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Description</label
-            >
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea
+              name="description"
               rows="4"
               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
             ></textarea>
           </div>
+          <!-- Form Buttons -->
           <div class="flex justify-end gap-4">
             <button
               type="button"
@@ -425,6 +376,87 @@
             sidebar.classList.remove("active");
           }
         }
+      });
+
+      // Fetch and display job listings
+      function fetchJobListings() {
+        fetch('fetch_job_listings.php')
+          .then(response => response.json())
+          .then(data => {
+            const jobListingsContainer = document.getElementById('jobListings');
+
+            data.forEach(job => {
+              const jobCard = document.createElement('div');
+              jobCard.className = 'p-8 bg-white border border-gray-100 rounded-xl hover:border-gray-200 transition-colors';
+              jobCard.innerHTML = `
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h3 class="text-lg font-semibold">${job.employment}</h3>
+                    <p class="text-gray-600 mt-1">${job.location}</p>
+                    <div class="flex gap-2 mt-3">
+                      <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">${job.employment_type}</span>
+                      <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">${job.salary}</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-green-600 text-sm font-medium">Published</span>
+                    <button class="text-gray-400 hover:text-gray-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              `;
+              jobListingsContainer.appendChild(jobCard);
+            });
+          })
+          .catch(error => console.error('Error fetching job listings:', error));
+      }
+
+      // Fetch job listings on page load
+      document.addEventListener('DOMContentLoaded', fetchJobListings);
+
+      // Handle form submission
+      document.getElementById("createJobForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Get form data
+        const location = this.location.value;
+        const employment = this.employment.value;
+        const employmentType = this.employment_type.value;
+        const salary = this.salary.value;
+        const description = this.description.value;
+
+        // Create a FormData object to send data
+        const formData = new FormData();
+        formData.append('location', location);
+        formData.append('employment', employment);
+        formData.append('employment_type', employmentType);
+        formData.append('salary', salary);
+        formData.append('description', description);
+
+        // Send the data to the server using fetch
+        fetch('create_job_listings.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Fetch and display updated job listings
+            fetchJobListings();
+
+            // Close the modal after handling the form data
+            hideAddJobModal();
+
+            // Optionally, clear the form fields
+            this.reset();
+          } else {
+            alert('Failed to create job listing. Please try again.');
+          }
+        })
+        .catch(error => console.error('Error:', error));
       });
     </script>
   </body>
