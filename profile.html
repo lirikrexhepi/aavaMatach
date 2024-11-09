@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=general-sans@500,600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+        body {
+            font-family: "General Sans", sans-serif;
+            background: linear-gradient(145deg, #f0f0f0 0%, #e0e0e0 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-content {
+            display: flex;
+            margin-top: 20px;
+        }
+
+        .profile-header {
+            background-color: #e0e0e0;
+            height: 200px;
+            position: relative;
+        }
+
+        .profile-picture {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid white;
+            position: absolute;
+            bottom: -50px;
+            left: 20px;
+        }
+
+        .profile-container {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            margin-right: 20px;
+            padding: 20px;
+            width: 600px;
+            text-align: left;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+            margin-top: 60px;
+        }
+
+        .profile-headline {
+            font-size: 16px;
+            color: #444;
+            margin: 5px 0;
+        }
+
+        .profile-location {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .profile-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            background-color: #444;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .button-outline {
+            background-color: transparent;
+            color: #444;
+            padding: 10px 20px;
+            border: 2px solid #444;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .profile-summary {
+            background-color: #f3f2ef;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .sidebar-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="profile-container">
+            <div class="profile-header">
+                <img src="profile-picture.jpg" alt="" class="profile-picture">
+            </div>
+            <h1 class="profile-name">Your Name</h1>
+            <p class="profile-headline">Full Stack Developer</p>
+            <p class="profile-location">Location · Contact info</p>
+            <div class="profile-buttons">
+                <button class="button">Open to</button>
+                <button class="button-outline">Add profile section</button>
+                <button class="button-outline">Enhance profile</button>
+                <button class="button-outline" id="edit-profile-btn">Edit Profile</button>
+            </div>
+            <div class="profile-summary">
+                <p>Open to work: Web Developer, Frontend Developer, Backend Developer...</p>
+            </div>
+        </div>
+        <div class="sidebar">
+            <div class="sidebar-box">
+                <h3>Box 1</h3>
+                <p>Some random content here.</p>
+            </div>
+            <div class="sidebar-box">
+                <h3>Box 2</h3>
+                <p>More random content here.</p>
+            </div>
+            <div class="sidebar-box">
+                <h3>Box 3</h3>
+                <p>Even more random content here.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for editing profile -->
+    <div class="modal" id="edit-profile-modal">
+        <div class="modal-content">
+            <button class="close-modal" id="close-modal-btn">&times;</button>
+            <h2>Edit Profile</h2>
+            <form>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" class="w-full mb-4 p-2 border rounded" value="Your Name">
+                
+                <label for="headline">Headline:</label>
+                <input type="text" id="headline" name="headline" class="w-full mb-4 p-2 border rounded" value="Full Stack Developer">
+                
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location" class="w-full mb-4 p-2 border rounded" value="Location · Contact info">
+                
+                <button type="submit" class="button">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const editProfileModal = document.getElementById('edit-profile-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+        editProfileBtn.addEventListener('click', () => {
+            editProfileModal.style.display = 'flex';
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            editProfileModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === editProfileModal) {
+                editProfileModal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
