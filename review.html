@@ -292,6 +292,48 @@
       .swipe-down {
         color: #f59e0b;
       }
+
+      .toast-notification {
+        position: fixed;
+        bottom: 15%;
+        left: 50%;
+        transform: translate(-50%, 50%);
+        background-color: #007aff;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+      }
+
+      .toast-notification.show {
+        opacity: 1;
+      }
+
+      .checkmark {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+      }
+
+      .swipe-hint {
+        position: fixed;
+        bottom: 15%;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #737373;
+        font-size: 14px;
+        opacity: 0.8;
+        text-align: center;
+        font-weight: 500;
+        z-index: 999;
+      }
     </style>
   </head>
   <body>
@@ -305,7 +347,20 @@
     </nav>
 
     <div class="bottom-nav">
-      <a href="./dashboard.html" class="bottom-nav-link">
+      <a href="./swipe.html" class="bottom-nav-link">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="nav-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M9 3L5 7M5 7L9 11M5 7H19M15 21L19 17M19 17L15 13M19 17H5" />
+        </svg>
+        Swipe
+      </a>
+      <a href="./match.html" class="bottom-nav-link">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="nav-icon"
@@ -335,7 +390,7 @@
         </svg>
         Review
       </a>
-      <a href="#" class="bottom-nav-link">
+      <a href="./profile.html" class="bottom-nav-link">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="nav-icon"
@@ -574,6 +629,15 @@
                     .join("")}
                 </div>
               </div>
+
+              <div class="mt-6">
+                <h3 class="font-medium mb-2">Share Your Experience</h3>
+                <textarea
+                  class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  rows="4"
+                  placeholder="Share your experience working at ${job.name}..."
+                ></textarea>
+              </div>
             </div>
           </div>
         `;
@@ -634,12 +698,6 @@
           // Add swipe functionality after animation
           setTimeout(() => {
             makeSwipeable(card);
-            // Add swipe indicators
-            if (!document.querySelector(".swipe-indicator")) {
-              const indicator = document.createElement("div");
-              indicator.className = "swipe-indicator";
-              document.body.appendChild(indicator);
-            }
           }, 400);
         });
 
@@ -670,56 +728,88 @@
       function makeSwipeable(card) {
         let startX, startY, moveX, moveY;
         let isDragging = false;
-        let currentDirection = null;
 
-        function showIndicator(direction) {
-          const indicator = document.querySelector(".swipe-indicator");
-
-          // If direction changed, fade out first
-          if (currentDirection && currentDirection !== direction) {
-            indicator.style.opacity = "0";
-
-            setTimeout(() => {
-              updateIndicator(indicator, direction);
-            }, 200); // Match the transition duration
-          } else {
-            updateIndicator(indicator, direction);
+        // Add styles for the hint text
+        const style = document.createElement("style");
+        style.textContent = `
+          .toast-notification {
+            position: fixed;
+            bottom: 15%;
+            left: 50%;
+            transform: translate(-50%, 50%);
+            background-color: #007AFF;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
           }
 
-          currentDirection = direction;
-        }
+          .toast-notification.show {
+            opacity: 1;
+          }
 
-        function updateIndicator(indicator, direction) {
-          // Update text and classes
-          indicator.textContent =
-            direction === "right"
-              ? "✕"
-              : direction === "left"
-              ? "✓"
-              : direction === "up"
-              ? "!"
-              : "?";
+          .checkmark {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+          }
 
-          // Remove all direction classes
-          indicator.classList.remove(
-            "swipe-right",
-            "swipe-left",
-            "swipe-up",
-            "swipe-down"
-          );
+          .swipe-hint {
+            position: fixed;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #8E8E93;
+            font-size: 14px;
+            opacity: 0.8;
+            text-align: center;
+            font-weight: 500;
+            z-index: 999;
+          }
+        `;
+        document.head.appendChild(style);
 
-          // Add new direction class
-          indicator.classList.add(`swipe-${direction}`);
+        // Add the hint text
+        const hintText = document.createElement("div");
+        hintText.className = "swipe-hint";
+        hintText.textContent = "Swipe anywhere to submit";
+        document.body.appendChild(hintText);
 
-          // Show the indicator
-          indicator.classList.add("visible");
-          indicator.style.opacity = "1";
-        }
+        function showToast(message) {
+          const toast = document.createElement("div");
+          toast.className = "toast-notification";
 
-        function hideIndicator() {
-          const indicator = document.querySelector(".swipe-indicator");
-          indicator.classList.remove("visible");
-          currentDirection = null;
+          // Add checkmark icon
+          const checkmark = document.createElement("span");
+          checkmark.className = "checkmark";
+          checkmark.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          `;
+
+          const messageSpan = document.createElement("span");
+          messageSpan.textContent = message;
+
+          toast.appendChild(checkmark);
+          toast.appendChild(messageSpan);
+          document.body.appendChild(toast);
+
+          // Show the toast
+          setTimeout(() => toast.classList.add("show"), 100);
+
+          // Remove the toast after 2 seconds
+          setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => toast.remove(), 300);
+          }, 2000);
         }
 
         function handleStart(e) {
@@ -741,53 +831,35 @@
 
           // Calculate rotation based on horizontal movement
           const rotate = moveX * 0.1;
-
           card.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px)) rotate(${rotate}deg)`;
-
-          // Determine swipe direction based on the strongest movement
-          const threshold = 50;
-          const absX = Math.abs(moveX);
-          const absY = Math.abs(moveY);
-
-          if (absX > threshold || absY > threshold) {
-            if (absX > absY) {
-              showIndicator(moveX > 0 ? "right" : "left");
-            } else {
-              showIndicator(moveY > 0 ? "down" : "up");
-            }
-          } else {
-            hideIndicator();
-          }
         }
 
         function handleEnd() {
           if (!isDragging) return;
           isDragging = false;
-          hideIndicator();
 
           const threshold = 100;
           card.style.transition = "transform 0.3s ease, opacity 0.3s ease";
 
           if (Math.abs(moveX) > threshold || Math.abs(moveY) > threshold) {
-            const direction =
-              Math.abs(moveX) > Math.abs(moveY)
-                ? moveX > 0
-                  ? "right"
-                  : "left"
-                : moveY > 0
-                ? "down"
-                : "up";
+            showToast("Review submitted successfully!");
+            console.log("Submitting review data...");
 
-            // Add rotation to the exit animation for left/right swipes
-            const rotate =
-              direction === "right" ? 45 : direction === "left" ? -45 : 0;
-            const endX =
-              direction === "right" ? 1500 : direction === "left" ? -1500 : 0;
-            const endY =
-              direction === "down" ? 1500 : direction === "up" ? -1500 : 0;
+            const angle = Math.atan2(moveY, moveX);
+            const endX = Math.cos(angle) * 1500;
+            const endY = Math.sin(angle) * 1500;
+            const rotate = moveX * 0.1;
 
             card.style.transform = `translate(calc(-50% + ${endX}px), calc(-50% + ${endY}px)) rotate(${rotate}deg)`;
             card.style.opacity = "0";
+
+            // Remove the hint container immediately on successful swipe
+            const hintContainer = document.querySelector(
+              ".swipe-hint-container"
+            );
+            if (hintContainer) {
+              hintContainer.remove();
+            }
 
             setTimeout(() => {
               document
@@ -796,7 +868,6 @@
               document.body.style.overflow = "auto";
             }, 300);
           } else {
-            // Reset position and rotation
             card.style.transform = "translate(-50%, -50%) rotate(0deg)";
           }
         }
