@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aava match</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#6B7280',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white">
+    <!-- Navbar -->
+    <nav class="w-full border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-center h-16 items-center">
+                <h1 class="text-xl font-bolder font-normal">aava match.</h1>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content - Centered with max-width -->
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Profile Card -->
+        <div class="bg-white rounded-lg overflow-hidden">
+            <!-- Cover Image -->
+            <div class="h-48 bg-gray-100 relative">
+                <!-- Profile Picture -->
+                <div class="absolute -bottom-12 left-8">
+                    <div class="w-24 h-24 bg-gray-200 rounded-full ring-4 ring-white overflow-hidden">
+                        <img src="your-profile-picture.png" alt="Profile Picture" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Content -->
+            <div class="pt-16 px-8 pb-8">
+                <!-- Basic Info -->
+                <div class="space-y-1">
+                    <h1 class="text-xl font-semibold text-gray-900">Company Name</h1>
+                    <p class="text-gray-600">Industry | Experience</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <button class="px-4 py-1.5 bg-gray-800 text-white text-sm rounded">
+                        Open to
+                    </button>
+                    <button class="px-4 py-1.5 border border-gray-300 text-gray-700 text-sm rounded">
+                        Add profile section
+                    </button>
+                    <button class="px-4 py-1.5 border border-gray-300 text-gray-700 text-sm rounded">
+                        Enhance profile
+                    </button>
+                    <button class="px-4 py-1.5 border border-gray-300 text-gray-700 text-sm rounded">
+                        Edit Profile
+                    </button>
+                </div>
+
+                <!-- Details Grid -->
+                <div class="mt-6 bg-gray-50 rounded-lg p-6">
+                    <div class="grid grid-cols-2 gap-x-12 gap-y-4 text-sm">
+                        <div>
+                            <span class="text-gray-500">Environment: </span>
+                            <span class="text-gray-700">Hybrid</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Hours: </span>
+                            <span class="text-gray-700">Working Hours: Fixed</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Company: </span>
+                            <span class="text-gray-700">Preferred Company Size: Medium</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Pace: </span>
+                            <span class="text-gray-700">Work Pace: Fast</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Style: </span>
+                            <span class="text-gray-700">Communication Style: Formal</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Team: </span>
+                            <span class="text-gray-700">Team Dynamic: Collaborative</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Balance: </span>
+                            <span class="text-gray-700">Work-Life Balance: Strict</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Support: </span>
+                            <span class="text-gray-700">Mental Health Support: Essential</span>
+                        </div>
+                    </div>
+
+                    <!-- Benefits -->
+                    <div class="mt-6">
+                        <div class="text-sm">
+                            <span class="text-gray-500">Benefits: </span>
+                            <span class="text-gray-700">Mental Health, Professional Dev, Remote Work</span>
+                        </div>
+                        <div class="mt-2 text-sm">
+                            <span class="text-gray-500">Goals: </span>
+                            <span class="text-gray-700">Work Life</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
