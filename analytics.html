@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Listings - Aava Match</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=general-sans@500,600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background: radial-gradient(
+            circle at 10% 20%,
+            rgba(0, 0, 0, 0.02) 0%,
+            transparent 8%
+          ),
+          radial-gradient(
+            circle at 90% 80%,
+            rgba(0, 0, 0, 0.02) 0%,
+            transparent 8%
+          );
+        background-color: #ffffff;
+      }
+
+      nav {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .sidebar {
+        width: 280px;
+        border-right: 1px solid rgba(0, 0, 0, 0.05);
+        background: rgba(255, 255, 255, 0.95);
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        overflow-y: auto;
+      }
+
+      .main-content {
+        margin-left: 280px;
+      }
+
+      @media (max-width: 1024px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.3s ease;
+        }
+
+        .sidebar.active {
+          transform: translateX(0);
+        }
+
+        .main-content {
+          margin-left: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Add Sidebar -->
+    <aside class="sidebar">
+      <div class="p-6">
+        <a href="#" class="text-xl font-semibold">aava match.</a>
+      </div>
+      <nav class="mt-6">
+        <div class="px-4 py-2 text-sm font-medium text-gray-400">Main Menu</div>
+        <ul class="space-y-1">
+          <li>
+            <a
+              href="/dashboard"
+              class="flex items-center gap-3 px-6 py-3 text-gray-600 hover:text-black hover:bg-gray-50"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                />
+              </svg>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a
+              href="/job-listings"
+              class="flex items-center gap-3 px-6 py-3 text-black bg-gray-50"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              Job Listings
+            </a>
+          </li>
+          <li>
+            <a
+              href="/applications"
+              class="flex items-center gap-3 px-6 py-3 text-gray-600 hover:text-black hover:bg-gray-50"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              Applications
+            </a>
+          </li>
+          <li>
+            <a
+              href="/settings"
+              class="flex items-center gap-3 px-6 py-3 text-gray-600 hover:text-black hover:bg-gray-50"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              Settings
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Update the nav and main content wrapper -->
+    <div class="main-content">
+      <main class="px-6 py-8">
+        <!-- Header section with title and create button -->
+        <div class="flex justify-between items-center mb-8"> Analytics
+          <h1 class="text-2xl font-semibold">Analytics</h1>
+          <button
+            onclick="showAddJobModal()"
+            class="px-4 py-2 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
+          >
+            Analytics of Aava Match
+          </button>
+        </div>
+
+        <div class="min-h-screen bg-gray-50 py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Header with navigation -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-xl font-semibold">Project: Aava Match</h1>
+                        <span class="text-gray-400">|</span>
+                        <span class="text-gray-600">aavamatch.com</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button class="px-3 py-1.5 text-sm border rounded-md hover:bg-gray-50">Last 30 days ▾</button>
+                        <button class="px-3 py-1.5 text-sm border rounded-md hover:bg-gray-50">Desktop ▾</button>
+                        <button class="px-3 py-1.5 text-sm border rounded-md hover:bg-gray-50">United States ▾</button>
+                    </div>
+                </div>
+
+                <!-- Matching Analytics Panel -->
+                <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold">Matching Analytics</h2>
+                        <span class="text-sm text-gray-500">Updated: 2 hours ago</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-4 gap-6">
+                        <!-- Match Score -->
+                        <div class="border rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Match Score</span>
+                                <span class="text-xs text-green-600">↑ 12%</span>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-3xl font-semibold text-blue-600">94</span>
+                                <span class="text-gray-400 text-sm">/100</span>
+                            </div>
+                        </div>
+
+                        <!-- Daily Matches -->
+                        <div class="border rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Daily Matches</span>
+                                <span class="text-xs text-green-600">↑ 3.44%</span>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-3xl font-semibold">18.9K</span>
+                            </div>
+                        </div>
+
+                        <!-- Active Users -->
+                        <div class="border rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Active Users</span>
+                                <span class="text-xs text-green-600">↑ 1.88%</span>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-3xl font-semibold">6.2K</span>
+                            </div>
+                        </div>
+
+                        <!-- Success Rate -->
+                        <div class="border rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Success Rate</span>
+                                <span class="text-xs text-green-600">↑ 2.14%</span>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-3xl font-semibold">78%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Match Quality Tracking -->
+                <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold">Match Quality Tracking</h2>
+                        <button class="text-sm text-blue-600">View full report</button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <!-- Match Quality Graph -->
+                        <div class="border rounded-lg p-4">
+                            <div class="h-48 bg-gray-50 rounded flex items-center justify-center">
+                                [Match Quality Graph Placeholder]
+                            </div>
+                        </div>
+
+                        <!-- Top Matching Categories -->
+                        <div class="border rounded-lg p-4">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="text-sm text-gray-500">
+                                        <th class="text-left pb-2">Category</th>
+                                        <th class="text-left pb-2">Match Rate</th>
+                                        <th class="text-left pb-2">Change</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm">
+                                    <tr>
+                                        <td class="py-2">Tech Roles</td>
+                                        <td>92%</td>
+                                        <td class="text-green-600">↑ 2.3%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">Marketing</td>
+                                        <td>88%</td>
+                                        <td class="text-green-600">↑ 1.7%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">Sales</td>
+                                        <td>85%</td>
+                                        <td class="text-red-600">↓ 0.5%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Match Health Score -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold">Match Health Score</h2>
+                        <span class="text-sm text-gray-500">Updated: Mon, Dec 25, 2023</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-6">
+                        <!-- Health Score Chart -->
+                        <div class="col-span-1">
+                            <div class="relative h-48 flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="text-4xl font-bold text-blue-600">77%</div>
+                                    <div class="text-sm text-gray-500">Overall Health</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Health Metrics -->
+                        <div class="col-span-2">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="border rounded-lg p-4">
+                                    <div class="text-sm text-gray-600">Failed Matches</div>
+                                    <div class="text-2xl font-semibold text-red-600">204</div>
+                                </div>
+                                <div class="border rounded-lg p-4">
+                                    <div class="text-sm text-gray-600">Warnings</div>
+                                    <div class="text-2xl font-semibold text-orange-600">2986</div>
+                                </div>
+                                <div class="border rounded-lg p-4">
+                                    <div class="text-sm text-gray-600">Active Profiles</div>
+                                    <div class="text-2xl font-semibold">200</div>
+                                </div>
+                                <div class="border rounded-lg p-4">
+                                    <div class="text-sm text-gray-600">Match Accuracy</div>
+                                    <div class="text-2xl font-semibold text-green-600">95%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script>
+      function showAddJobModal() {
+        document.getElementById("addJobModal").classList.remove("hidden");
+        document.getElementById("addJobModal").classList.add("flex");
+      }
+
+      function hideAddJobModal() {
+        document.getElementById("addJobModal").classList.add("hidden");
+        document.getElementById("addJobModal").classList.remove("flex");
+      }
+
+      const menuButton = document.getElementById("menuButton");
+      const sidebar = document.querySelector(".sidebar");
+
+      menuButton.addEventListener("click", () => {
+        sidebar.classList.toggle("active");
+      });
+
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener("click", (e) => {
+        if (window.innerWidth < 1024) {
+          if (!sidebar.contains(e.target) && !menuButton.contains(e.target)) {
+            sidebar.classList.remove("active");
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
