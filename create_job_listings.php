@@ -1,31 +1,61 @@
 <?php
-include 'config.php'; // Include your database configuration
+require_once 'config/db.php';
+header('Content-Type: application/json');
 
-$conn = getDatabaseConnection(); // Get the database connection
+try {
+    // Check if the request is POST
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Validate required fields
+        $required_fields = ['employment', 'location', 'employment_type', 'salary', 'description'];
+        foreach ($required_fields as $field) {
+            if (empty($_POST[$field])) {
+                throw new Exception("Field '$field' is required");
+            }
+        }
 
-// Check if the form is submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Retrieve form data
-    $location = $_POST['location'] ?? '';
-    $employment = $_POST['employment'] ?? '';
-    $employmentType = $_POST['employment_type'] ?? '';
-    $salary = $_POST['salary'] ?? '';
-    $description = $_POST['description'] ?? '';
+        // Set a default company_id (you might want to get this from a session)
+        $company_id = 1; // Adjust this according to your needs
 
-    // Prepare and execute the SQL statement
-    $stmt = $conn->prepare("INSERT INTO job_listings (location, employment, employment_type, salary, description) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param('sssss', $location, $employment, $employmentType, $salary, $description);
+        // Prepare the SQL statement
+        $stmt = $pdo->prepare("
+            INSERT INTO job_listings (
+                company_id, 
+                employment, 
+                location, 
+                employment_type, 
+                salary, 
+                description
+            ) VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        
+        // Execute with the form data
+        $result = $stmt->execute([
+            $company_id,
+            $_POST['employment'],
+            $_POST['location'],
+            $_POST['employment_type'],
+            $_POST['salary'],
+            $_POST['description']
+        ]);
 
-    if ($stmt->execute()) {
-        // Redirect back to the job listings page
-        header('Location: job-listings.html');
-        exit();
+        if ($result) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Job listing created successfully',
+                'job_id' => $pdo->lastInsertId()
+            ]);
+        } else {
+            throw new Exception('Failed to insert job listing');
+        }
     } else {
-        echo "Error: " . $stmt->error;
+        throw new Exception('Invalid request method');
     }
-
-    $stmt->close();
+} catch (Exception $e) {
+    error_log('Job Creation Error: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error: ' . $e->getMessage()
+    ]);
 }
-
-$conn->close();
 ?>

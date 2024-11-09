@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // First check users table
-        $stmt = $pdo->prepare("SELECT id, password FROM users WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT id, password, fullname FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_start();
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_type'] = 'user';
+            $_SESSION['fullname'] = $user['fullname'];
             
             echo json_encode([
                 'success' => true,
