@@ -1,421 +1,316 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Listings - Aava Match</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://api.fontshare.com/v2/css?f[]=general-sans@500,600&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=general-sans@500,600&display=swap" rel="stylesheet">
     <style>
-      body {
-        font-family: "Inter", sans-serif;
-        background: radial-gradient(
-            circle at 10% 20%,
-            rgba(0, 0, 0, 0.02) 0%,
-            transparent 8%
-          ),
-          radial-gradient(
-            circle at 90% 80%,
-            rgba(0, 0, 0, 0.02) 0%,
-            transparent 8%
-          );
-        background-color: #ffffff;
-      }
-
-      nav {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-      }
-
-      .nav-container {
-        max-width: 1200px;
-        margin: 0 auto;
-      }
-
-      .sidebar {
-        width: 280px;
-        border-right: 1px solid rgba(0, 0, 0, 0.05);
-        background: rgba(255, 255, 255, 0.95);
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        overflow-y: auto;
-      }
-
-      .main-content {
-        margin-left: 280px;
-      }
-
-      @media (max-width: 1024px) {
-        .sidebar {
-          transform: translateX(-100%);
-          transition: transform 0.3s ease;
+        body {
+            font-family: "Inter", sans-serif;
+            background: radial-gradient(circle at 10% 20%, rgba(0, 0, 0, 0.02) 0%, transparent 8%),
+                        radial-gradient(circle at 90% 80%, rgba(0, 0, 0, 0.02) 0%, transparent 8%);
+            background-color: #ffffff;
         }
 
-        .sidebar.active {
-          transform: translateX(0);
+        .sidebar {
+            width: 280px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: white;
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .main-content {
-          margin-left: 0;
+            margin-left: 280px;
         }
-      }
+
+        .job-card {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .job-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
     </style>
-  </head>
-  <body>
-    <!-- Add Sidebar -->
+</head>
+<body>
+    <!-- Sidebar -->
     <aside class="sidebar">
-      <div class="p-6">
-        <a href="#" class="text-xl font-semibold">aava match.</a>
-      </div>
-      <nav class="mt-6">
-        <div class="px-4 py-2 text-sm font-medium text-gray-400">Main Menu</div>
-        <ul class="space-y-1">
-          <li>
-            <a
-              href="/dashboard"
-              class="flex items-center gap-3 px-6 py-3 text-gray-600 hover:text-black hover:bg-gray-50"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                />
-              </svg>
-              Dashboard
-            </a>
-          </li>
-          <li>
-            <a
-              href="/job-listings"
-              class="flex items-center gap-3 px-6 py-3 text-black bg-gray-50"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
-              Job Listings
-            </a>
-          </li>
-          <li>
-            <a
-              href="/applications"
-              class="flex items-center gap-3 px-6 py-3 text-gray-600 hover:text-black hover:bg-gray-50"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-              Applications
-            </a>
-          </li>
-          <li>
-            <a
-              href="/settings"
-              class="flex items-center gap-3 px-6 py-3 text-gray-600 hover:text-black hover:bg-gray-50"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              Settings
-            </a>
-          </li>
-        </ul>
-      </nav>
+        <div class="p-6">
+            <a href="#" class="text-xl font-semibold">aava match.</a>
+        </div>
+        <nav class="mt-6">
+            <div class="px-4 py-2 text-sm font-medium text-gray-400">Main Menu</div>
+            <ul class="space-y-1">
+                <li>
+                    <a href="dashboard.html" class="flex items-center gap-3 px-6 py-3 text-gray-600 hover:text-black hover:bg-gray-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="analytics.html" class="flex items-center gap-3 px-6 py-3 text-gray-600 hover:text-black hover:bg-gray-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="job-listings.html" class="flex items-center gap-3 px-6 py-3 text-black bg-gray-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Job Listings
+                    </a>
+                </li>
+                <li>
+                    <a href="applications.html" class="flex items-center gap-3 px-6 py-3 text-gray-600 hover:text-black hover:bg-gray-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Applications
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </aside>
 
-    <!-- Update the nav and main content wrapper -->
+    <!-- Main Content -->
     <div class="main-content">
-      <main class="px-6 py-8">
-        <!-- Header section with title and create button -->
-        <div class="flex justify-between items-center mb-8">
-          <h1 class="text-2xl font-semibold">Job Listings</h1>
-          <button
-            onclick="showAddJobModal()"
-            class="px-4 py-2 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
-          >
-            Create listing
-          </button>
-        </div>
-
-        <!-- Search bar and filters in one row -->
-        <div class="flex flex-wrap items-center gap-4 mb-8">
-          <div class="relative flex-1 max-w-md">
-            <input
-              type="text"
-              placeholder="Search listings..."
-              class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
-            />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 16l-4 4m0 0l4-4m-4 4h18M3 8l4-4m0 0l-4 4m4-4v18"
-              />
-            </svg>
-          </div>
-          <button
-            class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition-colors"
-          >
-            Filter
-          </button>
-        </div>
-
-        <!-- Job listings container -->
-        <div id="jobListings" class="space-y-4 mx-auto" style="max-width: calc(100% - 48px)">
-          <!-- Hardcoded Job Card -->
-          <div class="p-8 bg-white border border-gray-100 rounded-xl hover:border-gray-200 transition-colors">
-            <div class="flex justify-between items-start">
-              <div>
-                <h3 class="text-lg font-semibold">Software Engineer</h3>
-                <p class="text-gray-600 mt-1">San Francisco</p>
-                <div class="flex gap-2 mt-3">
-                  <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">Full-time</span>
-                  <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">$120,000</span>
+        <main class="max-w-6xl mx-auto px-6 py-8">
+            <!-- Header Section -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-2xl font-semibold mb-2">Job Listings</h1>
+                    <p class="text-gray-600">Manage and track your job postings</p>
                 </div>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="text-green-600 text-sm font-medium">Published</span>
-                <button class="text-gray-400 hover:text-gray-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                  </svg>
-                </button>
-              </div>
+                <div class="flex gap-4">
+                    <button class="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                        </svg>
+                        Filter
+                    </button>
+                    <button onclick="showAddJobModal()" class="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+                        Create Listing
+                    </button>
+                </div>
             </div>
-          </div>
-          <!-- Dynamic Job Cards will be inserted here -->
-        </div>
-      </main>
+
+            <!-- Job Listings Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="job-listings">
+                <!-- Job listings will be dynamically inserted here -->
+            </div>
+        </main>
     </div>
 
-    <!-- Modal for creating a new job listing -->
-    <div
-      id="addJobModal"
-      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center"
-    >
-      <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-semibold">Create New Job Listing</h2>
-          <button
-            onclick="hideAddJobModal()"
-            class="text-gray-400 hover:text-gray-600"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+    <!-- Modal -->
+    <div id="createJobModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold">Create New Job Listing</h2>
+                <button onclick="hideAddJobModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="createJobForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
+                    <input type="text" name="employment" class="w-full px-4 py-2 border rounded-lg" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <input type="text" name="location" class="w-full px-4 py-2 border rounded-lg" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Employment Type</label>
+                    <select name="employment_type" class="w-full px-4 py-2 border rounded-lg" required>
+                        <option value="">Select Type</option>
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Freelance">Freelance</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Salary Range</label>
+                    <input type="text" name="salary" class="w-full px-4 py-2 border rounded-lg" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea name="description" rows="4" class="w-full px-4 py-2 border rounded-lg" required></textarea>
+                </div>
+
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="hideAddJobModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800">
+                        Create Listing
+                    </button>
+                </div>
+            </form>
         </div>
-        <form class="space-y-6" id="createJobForm" action="create_job_listings.php" method="POST">
-          <!-- Location Field -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-            <input
-              type="text"
-              name="location"
-              class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
-            />
-          </div>
-          <!-- Employment Field -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Employment</label>
-            <input
-              type="text"
-              name="employment"
-              class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
-            />
-          </div>
-          <!-- Employment Type Field -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Employment Type</label>
-            <select
-              name="employment_type"
-              class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
-            >
-              <option value="full-time">Full-time</option>
-              <option value="part-time">Part-time</option>
-              <option value="contract">Contract</option>
-            </select>
-          </div>
-          <!-- Salary Field -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Salary</label>
-            <input
-              type="text"
-              name="salary"
-              placeholder="Enter salary"
-              class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
-            />
-          </div>
-          <!-- Description Field -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea
-              name="description"
-              rows="4"
-              class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-black transition-colors"
-            ></textarea>
-          </div>
-          <!-- Form Buttons -->
-          <div class="flex justify-end gap-4">
-            <button
-              type="button"
-              onclick="hideAddJobModal()"
-              class="px-6 py-3 text-gray-600 font-medium hover:text-black transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              class="px-6 py-3 bg-black text-white font-medium hover:bg-gray-900 transition-colors rounded-xl"
-            >
-              Create Listing
-            </button>
-          </div>
-        </form>
-      </div>
     </div>
 
     <script>
-      function showAddJobModal() {
-        document.getElementById("addJobModal").classList.remove("hidden");
-        document.getElementById("addJobModal").classList.add("flex");
-      }
+        window.onload = function() {
+            const jobListingsContainer = document.getElementById('job-listings');
+            
+            fetch('fetch_job_listings.php')
+                .then(response => response.json())
+                .then(result => {
+                    if (!result.success) {
+                        throw new Error(result.error || 'Failed to fetch job listings');
+                    }
 
-      function hideAddJobModal() {
-        document.getElementById("addJobModal").classList.add("hidden");
-        document.getElementById("addJobModal").classList.remove("flex");
-      }
+                    const listings = result.data;
+                    
+                    if (!listings || listings.length === 0) {
+                        jobListingsContainer.innerHTML = `
+                            <div class="col-span-full text-center py-8">
+                                No job listings found
+                            </div>
+                        `;
+                        return;
+                    }
 
-      const menuButton = document.getElementById("menuButton");
-      const sidebar = document.querySelector(".sidebar");
+                    jobListingsContainer.innerHTML = '';
 
-      menuButton.addEventListener("click", () => {
-        sidebar.classList.toggle("active");
-      });
+                    listings.forEach(job => {
+                        const jobCard = `
+                            <div class="bg-white rounded-xl border p-6 job-card">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h3 class="text-lg font-semibold">${job.employment || 'No Title'}</h3>
+                                        <p class="text-gray-600">${job.company_name || 'Company Name'}</p>
+                                    </div>
+                                    <span class="bg-green-50 text-green-700 text-xs px-2 py-1 rounded-full">Active</span>
+                                </div>
+                                
+                                <div class="space-y-2">
+                                    <div class="flex items-center text-gray-600">
+                                        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        ${job.location || 'Location not specified'}
+                                    </div>
+                                    
+                                    <div class="flex items-center text-gray-600">
+                                        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                        </svg>
+                                        ${job.employment_type || 'Employment type not specified'}
+                                    </div>
+                                    
+                                    <div class="flex items-center text-gray-600">
+                                        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        ${job.salary || 'Salary not specified'}
+                                    </div>
+                                </div>
+                                
+                                <p class="mt-4 text-gray-600 line-clamp-2">${job.description || 'No description available'}</p>
+                                
+                                <div class="mt-4 pt-4 border-t flex justify-end">
+                                    <button class="text-sm text-gray-600 hover:text-black">View Details</button>
+                                </div>
+                            </div>
+                        `;
+                        jobListingsContainer.innerHTML += jobCard;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    jobListingsContainer.innerHTML = `
+                        <div class="col-span-full text-center py-8 text-red-500">
+                            Error: ${error.message}
+                        </div>
+                    `;
+                });
+        };
 
-      // Close sidebar when clicking outside on mobile
-      document.addEventListener("click", (e) => {
-        if (window.innerWidth < 1024) {
-          if (!sidebar.contains(e.target) && !menuButton.contains(e.target)) {
-            sidebar.classList.remove("active");
-          }
+        function showAddJobModal() {
+            const modal = document.getElementById('createJobModal');
+            modal.style.display = 'flex';
         }
-      });
 
-      // Fetch and display job listings
-      function fetchJobListings() {
-        fetch('fetch_job_listings.php')
-          .then(response => response.json())
-          .then(data => {
-            const jobListingsContainer = document.getElementById('jobListings');
+        function hideAddJobModal() {
+            const modal = document.getElementById('createJobModal');
+            modal.style.display = 'none';
+        }
 
-            data.forEach(job => {
-              const jobCard = document.createElement('div');
-              jobCard.className = 'p-8 bg-white border border-gray-100 rounded-xl hover:border-gray-200 transition-colors';
-              jobCard.innerHTML = `
-                <div class="flex justify-between items-start">
-                  <div>
-                    <h3 class="text-lg font-semibold">${job.employment}</h3>
-                    <p class="text-gray-600 mt-1">${job.location}</p>
-                    <div class="flex gap-2 mt-3">
-                      <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">${job.employment_type}</span>
-                      <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">${job.salary}</span>
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <span class="text-green-600 text-sm font-medium">Published</span>
-                    <button class="text-gray-400 hover:text-gray-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              `;
-              jobListingsContainer.appendChild(jobCard);
+        // Update the form submission handler in your existing script
+        document.getElementById('createJobForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            // Show loading state
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.innerHTML = 'Creating...';
+            submitButton.disabled = true;
+
+            fetch('create_job_listings.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    alert('Job listing created successfully!');
+                    // Refresh the job listings
+                    window.location.reload();
+                } else {
+                    throw new Error(data.message || 'Failed to create job listing');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            })
+            .finally(() => {
+                // Reset button state
+                submitButton.innerHTML = originalButtonText;
+                submitButton.disabled = false;
             });
-          })
-          .catch(error => console.error('Error fetching job listings:', error));
-      }
+        });
 
-      // Fetch job listings on page load
-      document.addEventListener('DOMContentLoaded', fetchJobListings);
+        // Close modal when clicking outside
+        document.getElementById('createJobModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideAddJobModal();
+            }
+        });
     </script>
-  </body>
+</body>
 </html>
